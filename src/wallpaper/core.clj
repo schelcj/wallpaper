@@ -38,12 +38,18 @@
   []
   (edn/read-string (slurp (:history config))))
 
+;; TODO - load only wallpapers form optional category (i.e. directory)
 (defn load-wallpapers
   "Build a seq of all the available wallpapers on disk."
   []
-  (file-seq (:wallpapers-dir config)))
+  (map #(.getPath %) (file-seq (:wallpapers-dir config))))
 
 (defn filter-wallpapers
   "Build seq of wallpapers fitlering out previously displayed wallpapers"
-  [papers history]
-  (filter papers history))
+  []
+  (vec (remove (set (load-history)) (load-wallpapers))))
+
+(defn random-wallpaper
+  "Get a random wallpaper from a list of wallpapers"
+  []
+  (first (shuffle (vec (filter-wallpapers)))))
