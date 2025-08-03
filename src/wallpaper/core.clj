@@ -70,6 +70,30 @@
   [sources]
   (vec (map #(io/file (:wallpapers-dir config) %) sources)))
 
+(defn load-wallpapers
+  "Build a seq of all the available wallpapers on disk.
+
+  Arguments:
+  - dirs (vector): All directories to search for wallpapers."
+  [dirs]
+  (loop [dirs dirs result []]
+    (if (empty? dirs)
+      (apply concat result)
+      (recur (rest dirs) (conj result (map #(.getPath %) (file-seq (first dirs))))))))
+
+(defn filter-wallpapers
+  "Build seq of wallpapers fitlering out previously displayed wallpapers
+
+  Arguments:
+  - wallpapers (seq): All wallpapers that were found for the given categories."
+  [wallpapers]
+  (remove (set (load-history)) wallpapers))
+
+(defn random-wallpaper
+  "Get a random wallpaper from a list of wallpapers"
+  [wallpapers]
+  (first (shuffle (vec wallpapers))))
+
 (defn record-history
   "Save the history of wallpapers that have been used to disk to avoid displaying the same wallpaper repeatedly.
 
@@ -82,20 +106,3 @@
   "Read the history of previously displayed wallpapers."
   []
   (edn/read-string (slurp (:history config))))
-
-;; TODO - load only wallpapers form optional category (i.e. directory)
-(defn load-wallpapers
-  "Build a seq of all the available wallpapers on disk."
-  [dirs]
-  (map #(.getPath %) (file-seq (first dirs))))
-
-(defn filter-wallpapers
-  "Build seq of wallpapers fitlering out previously displayed wallpapers"
-  []
-  (vec (remove (set (load-history)) (load-wallpapers))))
-
-;; TODO - need to pass the papers list
-(defn random-wallpaper
-  "Get a random wallpaper from a list of wallpapers"
-  []
-  (first (shuffle (vec (filter-wallpapers)))))
