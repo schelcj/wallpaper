@@ -59,6 +59,14 @@
   []
   (edn/read-string (slurp (:history config))))
 
+(defn record-history
+  "Save the history of wallpapers that have been used to disk to avoid displaying the same wallpaper repeatedly.
+
+  Arguments:
+  - wallpapers (vector): Wallpapers that have been displayed to be recorded for subsequent runs."
+  [wallpapers]
+  (spit (:history config) (pr-str wallpapers)))
+
 (defn wallpaper-dirs
   "Build a deq of all the directories to search for wallpapers in.
 
@@ -91,14 +99,6 @@
   [wallpapers]
   (first (shuffle (vec wallpapers))))
 
-(defn record-history
-  "Save the history of wallpapers that have been used to disk to avoid displaying the same wallpaper repeatedly.
-
-  Arguments:
-  - wallpapers (vector): Wallpapers that have been displayed to be recorded for subsequent runs."
-  [wallpapers]
-  (spit (:history config) (pr-str wallpapers)))
-
 ;; TODO
 ;; - if the lock file exists exit making no changes
 ;; - build list of directories to search for wallpapers
@@ -123,4 +123,7 @@
     (cond
       (:help options)
       (do (println (usage summary))
+          (System/exit 0))
+      (:lock options)
+      (do (println "set lockfile")
           (System/exit 0)))))
