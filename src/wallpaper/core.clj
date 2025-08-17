@@ -7,7 +7,7 @@
 (def prefix (io/file (System/getenv "HOME") ".wallpapers"))
 
 (def config {:lock-file (io/file prefix "lock")
-             :category-file (io/file prefix "category")
+             :category-file (io/file prefix "category.edn")
              :wallpapers-dir (io/file prefix "Wallpapers")
              :current (io/file prefix "current")
              :previous (io/file prefix "previous")
@@ -15,26 +15,15 @@
              :sources (io/file prefix "sources")
              :default-category "all"})
 
-;; Optional arguments
-;; - category: passed update category file on disk then let normal flow happen
-;; - clear: delete the category file on disk then let normal flow happen
-;; - flush-cache: delete history file then let normal flow happen
-;; - lock: write lock file and exit
-;; - unlock: delete lock file and let normal flow happen
-;; - previous: read contents of previous file, set the wallpaper to this wallpaper, exit
-;; - image: set the wallpaper to the given file path and exit
-;; - dump-cache: print contents of the history to STDOUT and exit
 (def cli-options
-  [["-c" "--category" "Wallpaper category"
-    :default (:default-category config)
-    :parse-fn str]
+  [["-c" "--category CATEGORY" "Wallpaper category"]
    ["-f" "--flush-cache" "Flush the wallpaper history cache"]
    ["-d" "--dump-cache" "Print current wallpaper history cache to STDOUT"]
    ["-l" "--lock" "Lock the current wallpaper"]
    ["-u" "--unlock" "Unlock the current wallpaper"]
    ["-p" "--previous" "Set the wallpaper to the previous image"]
-   ["-i" "--image" "Set the provided image as the current wallpaper"]
-   ["-t" "--tile" "Tiled the provided image as the wallpaper"]
+   ["-i" "--image IMAGE" "Set the provided image as the current wallpaper"]
+   ["-t" "--tile TILE" "Tiled the provided image as the wallpaper"]
    ["-r" "--clear" "Clear the previous wallpaper category"]
    ["-h" "--help" "Show help"]])
 
@@ -54,6 +43,29 @@
     (with-open [r (io/reader (:sources config))]
       (vec (line-seq r)))))
 
+(defn set-category
+  "Record the category to filter to.
+
+  Arguments:
+  - category (str): Category name (i.e. the directory)."
+  [& category]
+  (spit (:category-file config) (pr-str category)))
+
+(defn clear-category
+  "Delete the category file."
+  []
+  (.delete (io/file (:category-file config))))
+
+(defn set-lockfile
+  "Set the lockfile to keep the current wallpaper from being changed."
+  []
+  (spit (:lock-file config) ""))
+
+(defn clear-lockfile
+  "Clear the lockfile to all the current wallpaper to be changed."
+  []
+  (.delete (io/file (:lock-file config))))
+
 (defn load-history
   "Read the history of previously displayed wallpapers."
   []
@@ -66,6 +78,16 @@
   - wallpapers (vector): Wallpapers that have been displayed to be recorded for subsequent runs."
   [wallpapers]
   (spit (:history config) (pr-str wallpapers)))
+
+(defn dump-history
+  "Print the contents of the history to STDOUT."
+  []
+  (pprint (edn/read-string (slurp (:history config)))))
+
+(defn clear-history
+  "Clear the history contents to start over."
+  []
+  (record-history []))
 
 (defn wallpaper-dirs
   "Build a deq of all the directories to search for wallpapers in.
@@ -99,6 +121,11 @@
   [wallpapers]
   (first (shuffle (vec wallpapers))))
 
+(defn set-wallpaper
+  "Actually set the wallpaper."
+  []
+  (println "set the wallpaper here"))
+
 ;; TODO
 ;; - if the lock file exists exit making no changes
 ;; - build list of directories to search for wallpapers
@@ -116,14 +143,43 @@
 ;; - add wallpaper to the history
 ;; - record new history to disk
 ;; - exit
-;;
+
 (defn -main
   [& args]
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (cond
       (:help options)
-      (do (println (usage summary))
+        (do
+          (println (usage summary))
           (System/exit 0))
       (:lock options)
-      (do (println "set lockfile")
-          (System/exit 0)))))
+        (do (set-lockfile)
+            (System/exit 0))
+      (:unlock options)
+        (do (clear-lockfile))
+      (:category options)
+        (do
+          (set-category (:category options)))
+      (:dump-cache options)
+        (do
+          (dump-history))
+        ;; (System/exit 0)
+      (:flush-cache options)
+        (do
+          (clear-history))
+          ;; (System/exit 0)
+      (:previous options)
+        (do
+          ;; TODO
+          (println "set the wallpaper to the contents of the previous file"))
+      (:image options)
+        (do
+          ;; TODO
+          (println "set the wallpaper to the given image file"))
+      (:tile options)
+        (do
+          (println "set the wallpaper to the given image tiled"))
+      (:clear options)
+        (do
+          (clear-category)))
+    (set-wallpaper)))
