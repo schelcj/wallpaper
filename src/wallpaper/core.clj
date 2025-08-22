@@ -1,6 +1,7 @@
 (ns wallpaper.core
+  (:require [wallpaper.history :as history])
+  (:require [wallpaper.category :as category])
   (:require [clojure.tools.cli :refer [parse-opts]])
-  (:require [clojure.edn :as edn])
   (:require [clojure.java.io :as io])
   (:gen-class))
 
@@ -36,26 +37,6 @@
         options-summary]
        (clojure.string/join \newline)))
 
-(defn categories
-  [& category]
-  (if category
-    (vec category)
-    (with-open [r (io/reader (:sources config))]
-      (vec (line-seq r)))))
-
-(defn set-category
-  "Record the category to filter to.
-
-  Arguments:
-  - category (str): Category name (i.e. the directory)."
-  [& category]
-  (spit (:category-file config) (pr-str category)))
-
-(defn clear-category
-  "Delete the category file."
-  []
-  (.delete (io/file (:category-file config))))
-
 (defn set-lockfile
   "Set the lockfile to keep the current wallpaper from being changed."
   []
@@ -65,29 +46,6 @@
   "Clear the lockfile to all the current wallpaper to be changed."
   []
   (.delete (io/file (:lock-file config))))
-
-(defn load-history
-  "Read the history of previously displayed wallpapers."
-  []
-  (edn/read-string (slurp (:history config))))
-
-(defn record-history
-  "Save the history of wallpapers that have been used to disk to avoid displaying the same wallpaper repeatedly.
-
-  Arguments:
-  - wallpapers (vector): Wallpapers that have been displayed to be recorded for subsequent runs."
-  [wallpapers]
-  (spit (:history config) (pr-str wallpapers)))
-
-(defn dump-history
-  "Print the contents of the history to STDOUT."
-  []
-  (pprint (edn/read-string (slurp (:history config)))))
-
-(defn clear-history
-  "Clear the history contents to start over."
-  []
-  (record-history []))
 
 (defn wallpaper-dirs
   "Build a deq of all the directories to search for wallpapers in.
@@ -114,7 +72,7 @@
   Arguments:
   - wallpapers (seq): All wallpapers that were found for the given categories."
   [wallpapers]
-  (remove (set (load-history)) wallpapers))
+  (remove (set (history/load (:history config))) wallpapers))
 
 (defn random-wallpaper
   "Get a random wallpaper from a list of wallpapers"
@@ -159,14 +117,14 @@
         (do (clear-lockfile))
       (:category options)
         (do
-          (set-category (:category options)))
+          (category/set (:category-file config) (:category options)))
       (:dump-cache options)
         (do
-          (dump-history))
+          (history/dump (:history config)))
         ;; (System/exit 0)
       (:flush-cache options)
         (do
-          (clear-history))
+          (history/clear (:history config)))
           ;; (System/exit 0)
       (:previous options)
         (do
@@ -181,5 +139,5 @@
           (println "set the wallpaper to the given image tiled"))
       (:clear options)
         (do
-          (clear-category)))
+          (category/clear (:category-file config))))
     (set-wallpaper)))
