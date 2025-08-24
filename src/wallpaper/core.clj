@@ -117,7 +117,7 @@
         (do (clear-lockfile))
       (:category options)
         (do
-          (category/set (:category-file config) (:category options)))
+          (category/record (:category-file config) (:category options)))
       (:dump-cache options)
         (do
           (history/dump (:history config)))

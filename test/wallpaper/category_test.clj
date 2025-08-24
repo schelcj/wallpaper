@@ -10,21 +10,19 @@
 (def sources-file (-> "resources/fixtures/sources" io/resource))
 (def categories (string/split-lines (slurp sources-file)))
 
-;; pass file and optional category
 (deftest test-all
   (testing "Loading all categories")
   (is (= (count categories) (count (cat/all sources-file)))))
 
-;; pass file and category
-;; can recored category
-;; file exists and is non-zero length
-(deftest test-set
-  (testing "Setting a catgory"))
+(deftest test-record
+  (testing "Recording a catgory")
+  (cat/record category-file "foo")
+  (is (.exists category-file))
+  (pos? (.length category-file)))
 
-;; pass file
-;; can clear category
-;; file does not exist
 (deftest test-clear
-  (testing "Clearing a set category"))
+  (testing "Clearing a set category")
+  (cat/clear category-file)
+  (is (not (.exists category-file))))
 
 (.deleteOnExit category-file)

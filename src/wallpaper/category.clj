@@ -16,7 +16,7 @@
     (with-open [r (io/reader file)]
       (vec (line-seq r)))))
 
-(defn set
+(defn record
   "Record the category to filter to.
 
   Arguments:
