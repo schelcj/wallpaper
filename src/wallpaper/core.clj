@@ -3,6 +3,7 @@
   (:require [wallpaper.category :as category])
   (:require [clojure.tools.cli :refer [parse-opts]])
   (:require [clojure.java.io :as io])
+  (:require [clojure.java.shell :refer [sh]])
   (:gen-class))
 
 (def prefix (io/file (System/getenv "HOME") ".wallpapers"))
@@ -10,8 +11,8 @@
 (def config {:lock-file (io/file prefix "lock")
              :category-file (io/file prefix "category.edn")
              :wallpapers-dir (io/file prefix "Wallpapers")
-             :current (io/file prefix "current")
-             :previous (io/file prefix "previous")
+             :current (io/file prefix "current.edn")
+             :previous (io/file prefix "previous.edn")
              :history (io/file prefix "history.edn")
              :sources (io/file prefix "sources")
              :default-category "all"})
@@ -48,7 +49,7 @@
   (.delete (io/file (:lock-file config))))
 
 (defn wallpaper-dirs
-  "Build a deq of all the directories to search for wallpapers in.
+  "Build a seq of all the directories to search for wallpapers in.
 
   Arguments:
   - sources (vector): Potential directory supplied on command line via the --category flag."
@@ -74,6 +75,24 @@
   [wallpapers]
   (remove (set (history/load (:history config))) wallpapers))
 
+;; TODO - set weights on wallpapers based on ctime
+;; previous weights:
+;;    age_in_secs => weight
+;;    86400   => 1000,
+;;    604800  => 500,
+;;    2592000 => 200,
+;;
+;; if ((epoch - age_in_secs) < mtime) then push weight number of copies onto papers of the given paper
+;;
+;; (< (- (quot (System/currentTimeMillis) 1000) 86400) (.lastModified (io/file new-wallpaper))
+(defn weight-wallpapers
+  "Weight the wallpapers based on the mtime of the file so we favor newer images.
+
+  Arguments:
+  - wallpapers (seq): All wallpapers that we would like to weight."
+  [wallpapers]
+  wallpapers)
+
 (defn random-wallpaper
   "Get a random wallpaper from a list of wallpapers"
   [wallpapers]
@@ -82,25 +101,20 @@
 (defn set-wallpaper
   "Actually set the wallpaper."
   []
-  (println "set the wallpaper here"))
-
-;; TODO
-;; - if the lock file exists exit making no changes
-;; - build list of directories to search for wallpapers
-;;   - could be a single directory if passed a category via getopt
-;;   - could be a single directory if category file exists and directory exists
-;;   - if no arg and no file use contents of the default :sources file
-;; - build list of wallpapers in the directories built previously
-;; - load history of previously displayed wallpapers
-;; - filter out previously displayed from the list of wallpapers to create list of candidates
-;; - apply weights to the list of wallpapers according to ctime of the wallpaper to build new list
-;; - select random wallpaper from the filtered and weighted list
-;; - use setter to display wallpaper
-;; - rename the current file to previous file
-;; - add current wallpaper to current file
-;; - add wallpaper to the history
-;; - record new history to disk
-;; - exit
+  (let [
+    sources (category/all (:sources config))
+    dirs (wallpaper-dirs sources)
+    wallpapers (load-wallpapers dirs)
+    filtered-wallpapers (filter-wallpapers wallpapers)
+    weighted-wallpapers (weight-wallpapers filtered-wallpapers)
+    new-wallpaper (random-wallpaper weighted-wallpapers)
+    ]
+    (println (str "fbsetbg -f " new-wallpaper))
+    (sh "fbsetbg" "-f" new-wallpaper)
+    (history/set-previous (:current config) (:previous config))
+    (history/set-current (:current config) new-wallpaper)
+    (history/record (:history config) new-wallpaper)))
+    ;; (System/exit 0)
 
 (defn -main
   [& args]
