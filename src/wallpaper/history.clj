@@ -13,7 +13,6 @@
   [history]
   (edn/read-string (slurp history)))
 
-;; TODO - change this to accept a single wallpaper and add it to the history file instead.
 (defn record
   "Save the history of wallpapers that have been used to disk to avoid displaying the same wallpaper repeatedly.
 
@@ -21,7 +20,7 @@
   - history (File): Location of the history cache.
   - wallpaper (String): Add the wallpaper to the history of displayed papers."
   [history wallpaper]
-  (let [wallpapers (load history)]
+  (let [wallpapers (restore history)]
     (spit history (pr-str (cons wallpaper wallpapers)))))
 
 (defn dump

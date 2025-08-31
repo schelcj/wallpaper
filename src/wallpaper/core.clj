@@ -1,3 +1,16 @@
+;; TODO
+;; - write weight function in papers namespace
+;; - write function to set the paper to the previous images
+;; - write function to set to a specific image, bypassing all filtering
+;; - write funciton to tile the wallpaper instead of setting fullscreen
+;; - cleanup all params and docs (not sure the comments are correct and that i'm using the correct type)
+;; - sources and categories is confusing, sort it out
+;; - write all the tests
+;; - update project, readme, and changelog
+;; - fix any errors that `lein run` uncovers
+;; - add config file support
+;; - change prefix to use `XDG_CONFIG_HOME` or fallback to `~/.config/wallpapers`
+;; - make the setter configurable
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
   (:require [wallpaper.category :as category])
@@ -55,7 +68,6 @@
     (history/set-previous (:current config) (:previous config))
     (history/set-current (:current config) new-wallpaper)
     (history/record (:history config) new-wallpaper)))
-    ;; (System/exit 0)
 
 (defn -main
   [& args]
@@ -76,12 +88,12 @@
           (category/record (:category-file config) (:category options)))
       (:dump-cache options)
         (do
-          (history/dump (:history config)))
-        ;; (System/exit 0)
+          (history/dump (:history config))
+          (System/exit 0))
       (:flush-cache options)
         (do
-          (history/clear (:history config)))
-          ;; (System/exit 0)
+          (history/clear (:history config))
+          (System/exit 0))
       (:previous options)
         (do
           ;; TODO
@@ -92,8 +104,10 @@
           (println "set the wallpaper to the given image file"))
       (:tile options)
         (do
+          ;; TODO
           (println "set the wallpaper to the given image tiled"))
       (:clear options)
         (do
           (category/clear (:category-file config))))
-    (set-wallpaper)))
+    (set-wallpaper))
+    (System/exit 0))
