@@ -5,7 +5,7 @@
   (:require [clojure.pprint :refer [pprint]])
   (:gen-class))
 
-(defn load
+(defn restore
   "Read the history of previously displayed wallpapers.
 
   Arguments:
