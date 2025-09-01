@@ -56,3 +56,11 @@
   - previous (File): Location of the previous file"
   [current previous]
   (io/copy current previous))
+
+(defn get-previous
+  "Gets the previous wallpaper.
+
+  Arguments:
+  - previous (String): Path to the previous file"
+  [previous]
+  (edn/read-string (slurp previous)))

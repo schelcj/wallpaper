@@ -1,13 +1,10 @@
 ;; TODO
 ;; - write weight function in papers namespace
-;; - write function to set the paper to the previous images
-;; - write function to set to a specific image, bypassing all filtering
 ;; - write funciton to tile the wallpaper instead of setting fullscreen
 ;; - cleanup all params and docs (not sure the comments are correct and that i'm using the correct type)
 ;; - sources and categories is confusing, sort it out
 ;; - write all the tests
 ;; - update project, readme, and changelog
-;; - fix any errors that `lein run` uncovers
 ;; - add config file support
 ;; - change prefix to use `XDG_CONFIG_HOME` or fallback to `~/.config/wallpapers`
 ;; - make the setter configurable
@@ -52,22 +49,30 @@
         options-summary]
        (clojure.string/join \newline)))
 
+(defn _set
+  [wallpaper]
+  (sh "fbsetbg" "-f" wallpaper)
+  (history/set-previous (:current config) (:previous config))
+  (history/set-current (:current config) wallpaper)
+  (history/record (:history config) wallpaper))
+
 (defn set-wallpaper
-  "Actually set the wallpaper."
-  []
-  (let [
-    sources (category/all (:sources config))
-    dirs (papers/dirs (:wallpapers-dir config) sources)
-    wallpapers (papers/gather dirs)
-    filtered-wallpapers (papers/prune (:history config) wallpapers)
-    weighted-wallpapers (papers/weight filtered-wallpapers)
-    new-wallpaper (papers/random weighted-wallpapers)
-    ]
-    (println (str "fbsetbg -f " new-wallpaper))
-    (sh "fbsetbg" "-f" new-wallpaper)
-    (history/set-previous (:current config) (:previous config))
-    (history/set-current (:current config) new-wallpaper)
-    (history/record (:history config) new-wallpaper)))
+  "Actually set the wallpaper.
+
+  Arguments:
+  - image (string): Optional path to a image file to set as the wallpaper skipping the random selection"
+  [image]
+  (if image
+    (_set image)
+    (let [
+      sources (category/all (:sources config))
+      dirs (papers/dirs (:wallpapers-dir config) sources)
+      wallpapers (papers/gather dirs)
+      filtered-wallpapers (papers/prune (:history config) wallpapers)
+      weighted-wallpapers (papers/weight filtered-wallpapers)
+      new-wallpaper (papers/random weighted-wallpapers)
+      ]
+      (_set new-wallpaper))))
 
 (defn -main
   [& args]
@@ -96,12 +101,12 @@
           (System/exit 0))
       (:previous options)
         (do
-          ;; TODO
-          (println "set the wallpaper to the contents of the previous file"))
+          (set-wallpaper (history/get-previous (:previous config)))
+          (System/exit 0))
       (:image options)
         (do
-          ;; TODO
-          (println "set the wallpaper to the given image file"))
+          (set-wallpaper (:image options))
+          (System/exit 0))
       (:tile options)
         (do
           ;; TODO
@@ -109,5 +114,5 @@
       (:clear options)
         (do
           (category/clear (:category-file config))))
-    (set-wallpaper))
+    (set-wallpaper nil))
     (System/exit 0))
