@@ -25,40 +25,46 @@
       (recur (rest dirs) (conj result (map #(.getPath %) (file-seq (first dirs))))))))
 
 (defn prune
-  "Build seq of wallpapers fitlering out previously displayed wallpapers
+  "Build seq of wallpapers fitlering out previously displayed wallpapers and directories.
 
   Arguments:
   - history (File): File for the history cache.
   - wallpapers (seq): All wallpapers that were found for the given categories."
   [history wallpapers]
-  (remove (set (history/restore history)) wallpapers))
+  (remove (set (history/restore history)) (remove #(.isDirectory (io/file %)) wallpapers)))
 
-;; TODO - set weights on wallpapers based on ctime
-;; previous weights:
-;;    age_in_secs => weight
-;;    86400   => 1000,
-;;    604800  => 500,
-;;    2592000 => 200,
-;;
-;; if ((epoch - age_in_secs) < mtime) then push weight number of copies onto papers of the given paper
-;;
-;; use the mtime of the image to compare to the current time minus the weighted time and if weighted time is less than
-;; the mtime repeat that image path weight times and push onto the papers seq. do this for all images in the seq.
-;;
-;; used ctime in the perl version, which is the same in the case of these images since i never touch them once downloaded.
-;;
-;; (< (- (quot (System/currentTimeMillis) 1000) 86400) (.lastModified (io/file new-wallpaper))
-;; (take 5 (repeat (last wallpapers))
-;; (conj (take 10 (repeat (first wallpapers) wallpapers)))
 (defn weight
+  "Applies a weight for the given wallpaper based on the mtime of the file.
+
+  Arguments:
+  - wallpaper (String): Full path to an image file to test.
+  - weights: (Map): Map of weights to apply where the key is time in seconds and the value is number of times to repeat the image."
+  [wallpaper weights]
+  (let [now (quot (System/currentTimeMillis) 1000)
+        mtime (quot (.lastModified (io/file wallpaper)) 1000)]
+    (when-let [weight (some->>
+      (keys weights)
+      (filter #(< (- now %) mtime))
+      seq
+      (reduce min))]
+    (get weights weight))))
+
+(defn apply-weights
   "Weight the wallpapers based on the mtime of the file so we favor newer images.
 
   Arguments:
-  - wallpapers (seq): All wallpapers that we would like to weight."
-  [wallpapers]
-  wallpapers)
+  - wallpapers (seq): All wallpapers that we would like to weight.
+  - weights: (Map): Map of weights to apply where the key is time in seconds and the value is number of times to repeat the image."
+  [wallpapers weights]
+  (mapcat (fn [wallpaper]
+    (let [w (or (weight wallpaper weights) 1)]
+      (repeat w wallpaper)))
+      wallpapers))
 
 (defn random
-  "Get a random wallpaper from a list of wallpapers"
+  "Get a random wallpaper from a list of wallpapers
+
+  Arguments:
+  - wallpapers (seq): All wallpapers to pull a random image from."
   [wallpapers]
   (first (shuffle (vec wallpapers))))

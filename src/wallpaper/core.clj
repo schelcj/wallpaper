@@ -1,5 +1,5 @@
 ;; TODO
-;; - write weight function in papers namespace
+;; - need to handle case where all wallpapers have been displayed and the filtering returns an empty seq
 ;; - write funciton to tile the wallpaper instead of setting fullscreen
 ;; - cleanup all params and docs (not sure the comments are correct and that i'm using the correct type)
 ;; - sources and categories is confusing, sort it out
@@ -8,6 +8,7 @@
 ;; - add config file support
 ;; - change prefix to use `XDG_CONFIG_HOME` or fallback to `~/.config/wallpapers`
 ;; - make the setter configurable
+;; - experiment with github actions to run tests and builds for binary downloads
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
   (:require [wallpaper.category :as category])
@@ -26,7 +27,10 @@
              :previous (io/file prefix "previous.edn")
              :history (io/file prefix "history.edn")
              :sources (io/file prefix "sources")
-             :default-category "all"})
+             :default-category "all"
+             :weights {86400 1000
+                       604800 500
+                       2592000 200}})
 
 (def cli-options
   [["-c" "--category CATEGORY" "Wallpaper category"]
@@ -64,14 +68,12 @@
   [image]
   (if image
     (_set image)
-    (let [
-      sources (category/all (:sources config))
-      dirs (papers/dirs (:wallpapers-dir config) sources)
-      wallpapers (papers/gather dirs)
-      filtered-wallpapers (papers/prune (:history config) wallpapers)
-      weighted-wallpapers (papers/weight filtered-wallpapers)
-      new-wallpaper (papers/random weighted-wallpapers)
-      ]
+    (let [sources (category/all (:sources config))
+          dirs (papers/dirs (:wallpapers-dir config) sources)
+          wallpapers (papers/gather dirs)
+          filtered-wallpapers (papers/prune (:history config) wallpapers) ; TODO - what if this is empty?
+          weighted-wallpapers (papers/apply-weights filtered-wallpapers (:weights config))
+          new-wallpaper (papers/random weighted-wallpapers)]
       (_set new-wallpaper))))
 
 (defn -main
@@ -79,40 +81,40 @@
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (cond
       (:help options)
-        (do
-          (println (usage summary))
-          (System/exit 0))
+      (do
+        (println (usage summary))
+        (System/exit 0))
       (:lock options)
-        (do
-          (spit (:lock-file config) "")
-          (System/exit 0))
+      (do
+        (spit (:lock-file config) "")
+        (System/exit 0))
       (:unlock options)
-        (do (.delete (io/file (:lock-file config))))
+      (do (.delete (io/file (:lock-file config))))
       (:category options)
-        (do
-          (category/record (:category-file config) (:category options)))
+      (do
+        (category/record (:category-file config) (:category options)))
       (:dump-cache options)
-        (do
-          (history/dump (:history config))
-          (System/exit 0))
+      (do
+        (history/dump (:history config))
+        (System/exit 0))
       (:flush-cache options)
-        (do
-          (history/clear (:history config))
-          (System/exit 0))
+      (do
+        (history/clear (:history config))
+        (System/exit 0))
       (:previous options)
-        (do
-          (set-wallpaper (history/get-previous (:previous config)))
-          (System/exit 0))
+      (do
+        (set-wallpaper (history/get-previous (:previous config)))
+        (System/exit 0))
       (:image options)
-        (do
-          (set-wallpaper (:image options))
-          (System/exit 0))
+      (do
+        (set-wallpaper (:image options))
+        (System/exit 0))
       (:tile options)
-        (do
+      (do
           ;; TODO
-          (println "set the wallpaper to the given image tiled"))
+        (println "set the wallpaper to the given image tiled"))
       (:clear options)
-        (do
-          (category/clear (:category-file config))))
+      (do
+        (category/clear (:category-file config))))
     (set-wallpaper nil))
-    (System/exit 0))
+  (System/exit 0))
