@@ -1,7 +1,9 @@
 (ns wallpaper.papers
   "Functions to find, filter, weight, and apply the wallpaper."
+  (:require [wallpaper.category :as category])
   (:require [wallpaper.history :as history])
   (:require [clojure.java.io :as io])
+  (:require [clojure.java.shell :refer [sh]])
   (:gen-class))
 
 (defn dirs
@@ -65,6 +67,29 @@
   "Get a random wallpaper from a list of wallpapers
 
   Arguments:
-  - wallpapers (seq): All wallpapers to pull a random image from."
-  [wallpapers]
-  (first (shuffle (vec wallpapers))))
+  - config (Map): Map of the configuration settings"
+  [config]
+  (let [sources (category/all (:sources config))
+          dirs (dirs (:wallpapers-dir config) sources)
+          wallpapers (gather dirs)
+          filtered-wallpapers (prune (:history config) wallpapers)
+          effective-wallpapers (if (seq filtered-wallpapers)
+                                 filtered-wallpapers
+                                 (do
+                                   (history/clear (:history config))
+                                   wallpapers))
+          weighted-wallpapers (apply-weights effective-wallpapers (:weights config))]
+          (first (shuffle (vec weighted-wallpapers)))))
+
+(defn display
+  "Actually set the wallpaper. Records the current wallpaper as the previous, sets the new current
+  to the passed image, records the passed image in the history, and sets the actual display background.
+
+  Arguments:
+  - config (Map): Map of the configuration settings
+  - image (String): Path to a image file to set as the wallpaper"
+  [config wallpaper]
+  (sh "fbsetbg" "-f" wallpaper)
+  (history/set-previous (:current config) (:previous config))
+  (history/set-current (:current config) wallpaper)
+  (history/record (:history config) wallpaper))

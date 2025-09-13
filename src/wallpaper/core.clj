@@ -1,5 +1,8 @@
 ;; TODO
-;; - need to handle case where all wallpapers have been displayed and the filtering returns an empty seq
+;; - single category selection is not working
+;; - pass around the config map or not, not sure what the best approach is?
+;;   - maybe a config namespace to house all that stuffs...
+;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write funciton to tile the wallpaper instead of setting fullscreen
 ;; - cleanup all params and docs (not sure the comments are correct and that i'm using the correct type)
 ;; - sources and categories is confusing, sort it out
@@ -9,13 +12,13 @@
 ;; - change prefix to use `XDG_CONFIG_HOME` or fallback to `~/.config/wallpapers`
 ;; - make the setter configurable
 ;; - experiment with github actions to run tests and builds for binary downloads
+;; - unknown args are silently ignore, probably should throw an error
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
   (:require [wallpaper.category :as category])
   (:require [wallpaper.papers :as papers])
   (:require [clojure.tools.cli :refer [parse-opts]])
   (:require [clojure.java.io :as io])
-  (:require [clojure.java.shell :refer [sh]])
   (:gen-class))
 
 (def prefix (io/file (System/getenv "HOME") ".wallpapers"))
@@ -53,29 +56,6 @@
         options-summary]
        (clojure.string/join \newline)))
 
-(defn _set
-  [wallpaper]
-  (sh "fbsetbg" "-f" wallpaper)
-  (history/set-previous (:current config) (:previous config))
-  (history/set-current (:current config) wallpaper)
-  (history/record (:history config) wallpaper))
-
-(defn set-wallpaper
-  "Actually set the wallpaper.
-
-  Arguments:
-  - image (string): Optional path to a image file to set as the wallpaper skipping the random selection"
-  [image]
-  (if image
-    (_set image)
-    (let [sources (category/all (:sources config))
-          dirs (papers/dirs (:wallpapers-dir config) sources)
-          wallpapers (papers/gather dirs)
-          filtered-wallpapers (papers/prune (:history config) wallpapers) ; TODO - what if this is empty?
-          weighted-wallpapers (papers/apply-weights filtered-wallpapers (:weights config))
-          new-wallpaper (papers/random weighted-wallpapers)]
-      (_set new-wallpaper))))
-
 (defn -main
   [& args]
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
@@ -89,7 +69,8 @@
         (spit (:lock-file config) "")
         (System/exit 0))
       (:unlock options)
-      (do (.delete (io/file (:lock-file config))))
+      (do
+        (.delete (io/file (:lock-file config))))
       (:category options)
       (do
         (category/record (:category-file config) (:category options)))
@@ -103,18 +84,19 @@
         (System/exit 0))
       (:previous options)
       (do
-        (set-wallpaper (history/get-previous (:previous config)))
+        (papers/display config (history/get-previous (:previous config)))
         (System/exit 0))
       (:image options)
       (do
-        (set-wallpaper (:image options))
+        (papers/display config (:image options))
         (System/exit 0))
       (:tile options)
       (do
-          ;; TODO
+        ;; TODO
         (println "set the wallpaper to the given image tiled"))
       (:clear options)
       (do
         (category/clear (:category-file config))))
-    (set-wallpaper nil))
+
+      (papers/display config (papers/random config)))
   (System/exit 0))
