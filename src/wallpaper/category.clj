@@ -1,34 +1,37 @@
 (ns wallpaper.category
   "Functions to handle filtering the search for available wallpapers in categories (i.e. directories)."
+  (:require [wallpaper.config :as config])
   (:require [clojure.java.io :as io])
+  (:require [clojure.edn :as edn])
   (:gen-class))
 
 (defn all
   "Returns all the category (i.e. directories) to search for wallpapers.
-
-  Arguments:
-  - file (File): Location of the category file.
-  - category (String): Optional category name to limit the search to a single directory.
-  "
-  [file & category]
-  (if category
-    (vec category)
-    (with-open [r (io/reader file)]
-      (vec (line-seq r)))))
+  The default categories are in the `sources.edn` file within the configuration
+  directory. These are returned by default but can be overriden with the `--category`
+  argument which will limit selection to just that directory. This is stored in the
+  `category.end` file within the configuration directory."
+  []
+  (let [config (config/restore)
+        category-file (io/file (:category-file config))]
+    (if (.exists category-file)
+        (edn/read-string (slurp category-file))
+        (edn/read-string (slurp (:sources config)))
+    )))
 
 (defn record
-  "Record the category to filter to.
+  "Record the category to filter to the `category.edn` file within the configuration directory.
+  This will limit the selection of wallpapers to just images within the directory.
 
   Arguments:
-  - file (File): Location of the category file.
-  - category (str): Category name (i.e. the directory)."
-  [file & category]
-  (spit file (pr-str category)))
+  - category (str): Category name (i.e. the directory) to limit selection to."
+  [category]
+  (let [config (config/restore)]
+    (spit (:category-file config) (pr-str [category]))))
 
 (defn clear
   "Delete the category file that is used to filter the search for available wallpapers.
-
-  Arguments:
-  - file (File): Location of the category file."
-  [file]
-  (.delete (io/file file)))
+  This will allow selection of all wallpapers defined in the `sources.edn` file."
+  []
+  (let [config (config/restore)]
+    (.delete (io/file (:category-file config)))))

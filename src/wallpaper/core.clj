@@ -1,39 +1,21 @@
 ;; TODO
-;; - single category selection is not working
-;; - pass around the config map or not, not sure what the best approach is?
-;;   - maybe a config namespace to house all that stuffs...
-;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write funciton to tile the wallpaper instead of setting fullscreen
+;; - not following naming conventions for functions with side-effects, should rename things
 ;; - cleanup all params and docs (not sure the comments are correct and that i'm using the correct type)
-;; - sources and categories is confusing, sort it out
 ;; - write all the tests
 ;; - update project, readme, and changelog
-;; - add config file support
-;; - change prefix to use `XDG_CONFIG_HOME` or fallback to `~/.config/wallpapers`
-;; - make the setter configurable
 ;; - experiment with github actions to run tests and builds for binary downloads
-;; - unknown args are silently ignore, probably should throw an error
+;; - unknown args are silently ignored, probably should throw an error
+;; - add an `--init` option to setup the configuration files and directory
+;; - missing required values for args are not throwing anything (e.g. `--tile` without image)
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
+  (:require [wallpaper.config :as config])
   (:require [wallpaper.category :as category])
   (:require [wallpaper.papers :as papers])
   (:require [clojure.tools.cli :refer [parse-opts]])
   (:require [clojure.java.io :as io])
   (:gen-class))
-
-(def prefix (io/file (System/getenv "HOME") ".wallpapers"))
-
-(def config {:lock-file (io/file prefix "lock")
-             :category-file (io/file prefix "category.edn")
-             :wallpapers-dir (io/file prefix "Wallpapers")
-             :current (io/file prefix "current.edn")
-             :previous (io/file prefix "previous.edn")
-             :history (io/file prefix "history.edn")
-             :sources (io/file prefix "sources")
-             :default-category "all"
-             :weights {86400 1000
-                       604800 500
-                       2592000 200}})
 
 (def cli-options
   [["-c" "--category CATEGORY" "Wallpaper category"]
@@ -58,7 +40,8 @@
 
 (defn -main
   [& args]
-  (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
+  (let [config (config/restore)
+        {:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (cond
       (:help options)
       (do
@@ -73,30 +56,36 @@
         (.delete (io/file (:lock-file config))))
       (:category options)
       (do
-        (category/record (:category-file config) (:category options)))
+        (category/record (:category options)))
       (:dump-cache options)
       (do
-        (history/dump (:history config))
+        (history/dump)
         (System/exit 0))
       (:flush-cache options)
       (do
-        (history/clear (:history config))
+        (history/clear)
         (System/exit 0))
       (:previous options)
       (do
-        (papers/display config (history/get-previous (:previous config)))
+        (papers/display (history/get-previous))
         (System/exit 0))
       (:image options)
       (do
-        (papers/display config (:image options))
+        (papers/display (:image options))
         (System/exit 0))
       (:tile options)
       (do
         ;; TODO
-        (println "set the wallpaper to the given image tiled"))
+        (println "set the wallpaper to the given image tiled")
+        (System/exit 0))
       (:clear options)
       (do
-        (category/clear (:category-file config))))
+        (category/clear)
+        (System/exit 0)))
 
-      (papers/display config (papers/random config)))
+    (let [lock (io/file (:lock-file config))]
+      (if (.exists lock)
+        (System/exit 1)
+        (papers/display (papers/random)))))
+
   (System/exit 0))
