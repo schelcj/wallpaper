@@ -33,8 +33,10 @@
 (defn clear
   "Clear the history contents to start over."
   []
-  (let [config (config/restore)]
-    (record [])))
+  (let [config (config/restore)
+        history (io/file (:history config))]
+    (if (.exists history)
+      (.delete history))))
 
 (defn set-current
   "Record the given wallpaper as the current.

@@ -11,7 +11,6 @@
   "Build a seq of all the directories to search for wallpapers in.
 
   Arguments:
-  - base (File): File object for the base directory where all wallpapers are stored.
   - sources (vector): Potential directory supplied on command line via the --category flag."
   [sources]
   (let [config (config/restore)]
@@ -66,7 +65,8 @@
           wallpapers))
 
 (defn random
-  "Get a random wallpaper from a list of wallpapers"
+  "Get a random wallpaper from a list of wallpapers filtering out previously displayed papers and applying
+  weighting to favor new images."
   []
   (let [config (config/restore)
         sources (category/all)

@@ -1,13 +1,14 @@
 ;; TODO
 ;; - write funciton to tile the wallpaper instead of setting fullscreen
+;; - add an `--init` option to setup the configuration files and directory
 ;; - not following naming conventions for functions with side-effects, should rename things
-;; - cleanup all params and docs (not sure the comments are correct and that i'm using the correct type)
 ;; - write all the tests
+;; - unknown args are silently ignored, probably should throw an error
+;; - missing required values for args are not throwing anything (e.g. `--tile` without image)
+;;
+;; - cleanup all params and docs (not sure the comments are correct and that i'm using the correct type)
 ;; - update project, readme, and changelog
 ;; - experiment with github actions to run tests and builds for binary downloads
-;; - unknown args are silently ignored, probably should throw an error
-;; - add an `--init` option to setup the configuration files and directory
-;; - missing required values for args are not throwing anything (e.g. `--tile` without image)
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
   (:require [wallpaper.config :as config])
