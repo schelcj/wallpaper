@@ -87,9 +87,17 @@
 
   Arguments:
   - image (String): Path to a image file to set as the wallpaper"
-  [wallpaper]
+  [wallpaper tiled]
   (let [config (config/restore)]
     (sh "fbsetbg" "-f" wallpaper)
     (history/set-previous)
     (history/set-current wallpaper)
     (history/record wallpaper)))
+
+(defn fullscreen
+  [wallpaper]
+  (sh "fbsetbg" "-f" wallpaper))
+
+(defn tiled
+  [wallpaper]
+  (sh "fbsetbg" "-t" wallpaper))
