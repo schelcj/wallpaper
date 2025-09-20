@@ -1,12 +1,14 @@
 ;; TODO
-;; - write funciton to tile the wallpaper instead of setting fullscreen
 ;; - add an `--init` option to setup the configuration files and directory
 ;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write all the tests
 ;; - unknown args are silently ignored, probably should throw an error
 ;; - missing required values for args are not throwing anything (e.g. `--tile` without image)
+;; - switched to xdg-rc library
+;; - move all stateful config settings to xdg state dir
+;; - make sources an option to add or remove from the defualt list
+;; - make the setter configurable to switch out `fbsetbg`
 ;;
-;; - cleanup all params and docs (not sure the comments are correct and that i'm using the correct type)
 ;; - update project, readme, and changelog
 ;; - experiment with github actions to run tests and builds for binary downloads
 (ns wallpaper.core
@@ -68,16 +70,18 @@
         (System/exit 0))
       (:previous options)
       (do
-        (papers/display (history/get-previous))
+        (let [wallpaper (history/get-previous)]
+          (papers/display-fullscreen wallpaper))
         (System/exit 0))
       (:image options)
       (do
-        (papers/display (:image options))
+        (let [wallpaper (:image options)]
+        (papers/display-fullscreen wallpaper))
         (System/exit 0))
       (:tile options)
       (do
-        ;; TODO
-        (println "set the wallpaper to the given image tiled")
+        (let [wallpaper (:tile options)]
+          (papers/display-tiled wallpaper))
         (System/exit 0))
       (:clear options)
       (do
@@ -87,6 +91,8 @@
     (let [lock (io/file (:lock-file config))]
       (if (.exists lock)
         (System/exit 1)
-        (papers/display (papers/random)))))
+        (let [wallpaper (papers/random)]
+          (papers/display-fullscreen wallpaper)
+          (papers/record wallpaper)))))
 
   (System/exit 0))

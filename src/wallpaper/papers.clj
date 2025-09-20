@@ -81,23 +81,29 @@
         weighted-wallpapers (apply-weights effective-wallpapers)]
     (first (shuffle (vec weighted-wallpapers)))))
 
-(defn display
-  "Actually set the wallpaper. Records the current wallpaper as the previous, sets the new current
-  to the passed image, records the passed image in the history, and sets the actual display background.
+(defn record
+  "Records the current wallpaper as the previous, sets the new current
+  to the passed image, records the passed image in the history.
 
   Arguments:
-  - image (String): Path to a image file to set as the wallpaper"
-  [wallpaper tiled]
-  (let [config (config/restore)]
-    (sh "fbsetbg" "-f" wallpaper)
-    (history/set-previous)
-    (history/set-current wallpaper)
-    (history/record wallpaper)))
+  - wallpaper (String): Path to an image file that was used."
+  [wallpaper]
+  (history/set-previous)
+  (history/set-current wallpaper)
+  (history/record wallpaper))
 
-(defn fullscreen
+(defn display-fullscreen
+  "Displays the provided wallpaper over the entire root window.
+
+  Arguments:
+  - wallpaper (String): Path to image file to display."
   [wallpaper]
   (sh "fbsetbg" "-f" wallpaper))
 
-(defn tiled
+(defn display-tiled
+  "Displayes the provided wallpaper tiled over the entire root window.
+
+  Arguments:
+  - wallpaper (String): Path to image file to display."
   [wallpaper]
   (sh "fbsetbg" "-t" wallpaper))
