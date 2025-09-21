@@ -15,9 +15,8 @@
   (let [config (config/restore)
         category-file (io/file (:category-file config))]
     (if (.exists category-file)
-        (edn/read-string (slurp category-file))
-        (edn/read-string (slurp (:sources config)))
-    )))
+      (edn/read-string (slurp category-file))
+      (edn/read-string (slurp (:sources config))))))
 
 (defn record
   "Record the category to filter to the `category.edn` file within the configuration directory.
@@ -35,3 +34,23 @@
   []
   (let [config (config/restore)]
     (.delete (io/file (:category-file config)))))
+
+(defn add-category!
+  "Adds a category to the list of categories search for a random wallpaper.
+
+  Arguments:
+  - category (String): category to add"
+  [category]
+  (let [config (config/restore)
+        sources (edn/read-string (slurp (:sources config)))]
+    (spit (:sources config) (seq (conj (set sources) category)))))
+
+(defn del-category!
+  "Removes a category from the list of categories to search for a random wallpaper.
+
+  Argurments:
+  - category (String): category to remove"
+  [category]
+  (let [config (config/restore)
+        sources (edn/read-string (slurp (:sources config)))]
+    (spit (:sources config) (pr-str (filter #(not= category %) sources)))))

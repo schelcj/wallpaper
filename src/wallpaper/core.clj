@@ -1,5 +1,4 @@
 ;; TODO
-;; - add an `--init` option to setup the configuration files and directory
 ;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write all the tests
 ;; - unknown args are silently ignored, probably should throw an error
@@ -22,14 +21,17 @@
 
 (def cli-options
   [["-c" "--category CATEGORY" "Wallpaper category"]
+   ["-a" "--add-category CATEGORY" "Add category to the selection list"]
+   ["-d" "--del-category CATEGORY" "Remove category from the selection list"]
    ["-f" "--flush-cache" "Flush the wallpaper history cache"]
-   ["-d" "--dump-cache" "Print current wallpaper history cache to STDOUT"]
+   ["-D" "--dump-cache" "Print current wallpaper history cache to STDOUT"]
    ["-l" "--lock" "Lock the current wallpaper"]
    ["-u" "--unlock" "Unlock the current wallpaper"]
    ["-p" "--previous" "Set the wallpaper to the previous image"]
    ["-i" "--image IMAGE" "Set the provided image as the current wallpaper"]
    ["-t" "--tile TILE" "Tiled the provided image as the wallpaper"]
    ["-r" "--clear" "Clear the previous wallpaper category"]
+   ["-I" "--init" "Initialize caching and configuration files"]
    ["-h" "--help" "Show help"]])
 
 (defn usage [options-summary]
@@ -60,6 +62,14 @@
       (:category options)
       (do
         (category/record (:category options)))
+      (:add-category options)
+      (do
+        (category/add-category! (:add-category options))
+        (System/exit 0))
+      (:del-category options)
+      (do
+        (category/del-category! (:del-category options))
+        (System/exit 0))
       (:dump-cache options)
       (do
         (history/dump)
@@ -76,7 +86,7 @@
       (:image options)
       (do
         (let [wallpaper (:image options)]
-        (papers/display-fullscreen wallpaper))
+          (papers/display-fullscreen wallpaper))
         (System/exit 0))
       (:tile options)
       (do
@@ -86,6 +96,12 @@
       (:clear options)
       (do
         (category/clear)
+        (System/exit 0))
+      (:init options)
+      (do
+        (config/init!)
+        (println "Initialization complete now set the wallpaper path in the config file:")
+        (println "Default configuration path: " (config/default-config-path))
         (System/exit 0)))
 
     (let [lock (io/file (:lock-file config))]

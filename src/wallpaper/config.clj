@@ -12,6 +12,11 @@
   "Where the default config file lives on disk."
   (io/file (xdg-config-dir app-name) "config.edn"))
 
+(defn default-config-path
+  "Path to the default configuration file."
+  []
+  (str config-file))
+
 (defn construct
   "Creates a map of all the default configuration file locations for caching and such.
 
@@ -74,4 +79,6 @@
     (.mkdirs (io/file (xdg-cache-dir app-name)))
     (.mkdirs (io/file (xdg-config-dir app-name)))
     (spit (io/file (:sources defaults)) ())
+    (spit (io/file (:current defaults)) ())
+    (spit (io/file (:previous defaults)) ())
     (spit (io/file (:history defaults)) ())))
