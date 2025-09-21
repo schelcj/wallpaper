@@ -5,6 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [
                  [org.clojure/clojure "1.11.1"]
-                 [org.clojure/tools.cli "1.1.230"]]
+                 [org.clojure/tools.cli "1.1.230"]
+                 [ahungry/xdg-rc "0.0.4"]]
   :main wallpaper.core
   :repl-options {:init-ns wallpaper.core})
