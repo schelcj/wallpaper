@@ -1,11 +1,6 @@
 ;; TODO
 ;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write all the tests
-;; - unknown args are silently ignored, probably should throw an error
-;; - missing required values for args are not throwing anything (e.g. `--tile` without image)
-;; - switched to xdg-rc library
-;; - move all stateful config settings to xdg state dir
-;; - make sources an option to add or remove from the defualt list
 ;; - make the setter configurable to switch out `fbsetbg`
 ;;
 ;; - update project, readme, and changelog
@@ -48,6 +43,12 @@
   (let [config (config/restore)
         {:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (cond
+      (seq errors)
+      (do
+        (println errors)
+        (println)
+        (println (usage summary))
+        (System/exit 1))
       (:help options)
       (do
         (println (usage summary))
