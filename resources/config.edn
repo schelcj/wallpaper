@@ -1,0 +1,46 @@
+{
+ ;; These are the default settings for the random wallpaper setter.
+ ;; Use this file to override the defaults.
+
+ ;; Top level directory where wallpapers are kept
+ ;; organized by category (i.e. directories of your
+ ;; choosing).
+ ;; :wallpapers-dir "$HOME/Dropbox/Wallpapers"
+
+ ;; Where to store the category to that limits
+ ;; random selection to.
+ ;; :category-file '$XDG_DATA_DIR/wallpaper/category.edn'
+
+ ;; A set of categories (i.e. directories) under the :wallpaper-dir
+ ;; root directory to limit the selection to if no category
+ ;; was specifically choosen with `--category`. For example; this prevents
+ ;; displaying xmas images out of season or showing the Propaganda
+ ;; tiles in a full screen mode without tiling.
+ ;; :sources '$XDG_DATA_DIR/wallpaper/sources.edn'
+
+ ;; Records all wallpapers that have been displayed previously
+ ;; since the last cache flush.
+ ;; :history '$XDG_CACHE_DIR/wallpaper/history.edn'
+
+ ;; Records the currently displayed wallpaper
+ ;; :current '$XDG_DATA_DIR/wallpaper/current.edn'
+
+ ;; Records the most recent displayed wallpaper
+ ;; :previous '$XDG_DATA_DIR/wallpaper/previous.edn'
+
+ ;; Lock file to prevent switching the wallpaper.
+ ;; :lock-file '$XDG_DATA_DIR/wallpaper/lock'
+
+ ;; Weights to apply to favor newer images. The format is
+ ;;
+ ;; {
+ ;;   age => weight
+ ;;   ...
+ ;; }
+ ;;
+ ;; where
+ ;; - age:    difference between mtime of the file and now
+ ;; - weight: number of times to repeat the image
+ ;;           in the list of possible wallpapers
+ ;; :weights {86400 1000, 604800 500, 2592000 200}
+}
