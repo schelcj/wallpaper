@@ -18,7 +18,8 @@
   [["-c" "--category CATEGORY" "Wallpaper category"]
    ["-a" "--add-category CATEGORY" "Add category to the selection list"]
    ["-d" "--del-category CATEGORY" "Remove category from the selection list"]
-   ["-f" "--flush-cache" "Flush the wallpaper history cache"]
+   ["-L" "--list-categories" "Print all configured categories to STDOUT"]
+   ["-F" "--flush-cache" "Flush the wallpaper history cache"]
    ["-D" "--dump-cache" "Print current wallpaper history cache to STDOUT"]
    ["-l" "--lock" "Lock the current wallpaper"]
    ["-u" "--unlock" "Unlock the current wallpaper"]
@@ -49,6 +50,13 @@
         (println)
         (println (usage summary))
         (System/exit 1))
+      (not (seq (category/all)))
+      (do
+        (println "No categories defined yet!")
+        (println "use --add-category to get started")
+        (println)
+        (println (usage summary))
+        (System/exit 1))
       (:help options)
       (do
         (println (usage summary))
@@ -70,6 +78,10 @@
       (:del-category options)
       (do
         (category/del-category! (:del-category options))
+        (System/exit 0))
+      (:list-categories options)
+      (do
+        (category/show-categories)
         (System/exit 0))
       (:dump-cache options)
       (do

@@ -35,8 +35,7 @@
   []
   (let [config (config/restore)
         history (io/file (:history config))]
-    (if (.exists history)
-      (.delete history))))
+    (spit (:history config) ())))
 
 (defn set-current
   "Record the given wallpaper as the current.
