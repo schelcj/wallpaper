@@ -1,7 +1,6 @@
 ;; TODO
 ;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write all the tests
-;; - something wrong with `config/init!` when run via the jar file but not in `lein run -- --init`
 ;;
 ;; - update readme, and changelog
 ;; - experiment with github actions to run tests and builds for binary downloads
