@@ -98,7 +98,10 @@
   Arguments:
   - wallpaper (String): Path to image file to display."
   [wallpaper]
-  (sh "fbsetbg" "-f" wallpaper))
+  (let [config (config/restore)
+        setter (:path (:setter config))
+        args (:full (:opts (:setter config)))]
+    (sh setter args wallpaper)))
 
 (defn display-tiled
   "Displayes the provided wallpaper tiled over the entire root window.
@@ -106,4 +109,7 @@
   Arguments:
   - wallpaper (String): Path to image file to display."
   [wallpaper]
-  (sh "fbsetbg" "-t" wallpaper))
+  (let [config (config/restore)
+        setter (:path (:setter config))
+        args (:tiled (:opts (:setter config)))]
+    (sh setter args wallpaper)))

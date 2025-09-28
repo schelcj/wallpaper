@@ -42,5 +42,21 @@
  ;; - age:    difference between mtime of the file and now
  ;; - weight: number of times to repeat the image
  ;;           in the list of possible wallpapers
- ;; :weights {86400 1000, 604800 500, 2592000 200}
+ ;; :weights {
+ ;;   86400   1000
+ ;;   604800  500
+ ;;   2592000 200
+ ;; }
+
+ ;; Path and options for the setter utilitity. I'm still
+ ;; using https://fluxbox.org/help/man-fbsetbg/ which relies
+ ;; on `feh` under the hood. Include args for full and tiled
+ ;; display.
+ ;; :setter {
+ ;;   :path "$HOME/bin/fbsetbg"
+ ;;   :opts {
+ ;;     :full "-f"
+ ;;     :tiled "-t"
+ ;;   }
+ ;; }
 }

@@ -1,9 +1,9 @@
 ;; TODO
 ;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write all the tests
-;; - make the setter configurable to switch out `fbsetbg`
+;; - something wrong with `config/init!` when run via the jar file but not in `lein run -- --init`
 ;;
-;; - update project, readme, and changelog
+;; - update readme, and changelog
 ;; - experiment with github actions to run tests and builds for binary downloads
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
@@ -28,6 +28,7 @@
    ["-t" "--tile TILE" "Tiled the provided image as the wallpaper"]
    ["-r" "--clear" "Clear the previous wallpaper category"]
    ["-I" "--init" "Initialize caching and configuration files"]
+   ["-C" "--current" "Show the currently display wallpaper path"]
    ["-h" "--help" "Show help"]])
 
 (defn usage [options-summary]
@@ -57,9 +58,9 @@
         (println)
         (println (usage summary))
         (System/exit 1))
-      (:help options)
+      (:current options)
       (do
-        (println (usage summary))
+        (println (history/get-current))
         (System/exit 0))
       (:lock options)
       (do
@@ -115,6 +116,10 @@
         (config/init!)
         (println "Initialization complete now set the wallpaper path in the config file:")
         (println "Default configuration path: " (config/default-config-path))
+        (System/exit 0))
+      (:help options)
+      (do
+        (println (usage summary))
         (System/exit 0)))
 
     (let [lock (io/file (:lock-file config))]

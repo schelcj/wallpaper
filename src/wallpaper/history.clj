@@ -46,6 +46,12 @@
   (let [config (config/restore)]
     (spit (:current config) (pr-str wallpaper))))
 
+(defn get-current
+  "Gets the current wallpaper"
+  []
+  (let [config (config/restore)]
+    (edn/read-string (slurp (:current config)))))
+
 (defn set-previous
   "Sets the previous wallpaper to the current"
   []
