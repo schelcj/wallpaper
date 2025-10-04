@@ -11,6 +11,7 @@ of [keepachangelog.com](http://keepachangelog.com/).
 - Completed [README](./README.md)
 - Completed this initial Changelog
 - renaming functions to match conventions for side-effects
+- added the `lein-binplus` plugin to build a binary wrapper
 
 ### Removed
 
