@@ -1,8 +1,8 @@
 ;; TODO
 ;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write all the tests
+;; - write wrapper to run the jar file
 ;;
-;; - update readme, and changelog
 ;; - experiment with github actions to run tests and builds for binary downloads
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
@@ -50,6 +50,12 @@
         (println)
         (println (usage summary))
         (System/exit 1))
+      (:init options)
+      (do
+        (config/init!)
+        (println "Initialization complete now set the wallpaper path in the config file:")
+        (println "Default configuration path: " (config/default-config-path))
+        (System/exit 0))
       (not (seq (category/all)))
       (do
         (println "No categories defined yet!")
@@ -109,12 +115,6 @@
       (:clear options)
       (do
         (category/clear)
-        (System/exit 0))
-      (:init options)
-      (do
-        (config/init!)
-        (println "Initialization complete now set the wallpaper path in the config file:")
-        (println "Default configuration path: " (config/default-config-path))
         (System/exit 0))
       (:help options)
       (do
