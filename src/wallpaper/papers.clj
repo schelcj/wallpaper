@@ -13,7 +13,7 @@
   Arguments:
   - sources (vector): Potential directory supplied on command line via the --category flag."
   [sources]
-  (let [config (config/restore)]
+  (let [config (config/restore!)]
     (vec (map #(io/file (:wallpapers-dir config) %) sources))))
 
 (defn gather
@@ -27,16 +27,16 @@
       (apply concat result)
       (recur (rest dirs) (conj result (map #(.getPath %) (file-seq (first dirs))))))))
 
-(defn prune
+(defn prune!
   "Build seq of wallpapers fitlering out previously displayed wallpapers and directories.
 
   Arguments:
   - wallpapers (seq): All wallpapers that were found for the given categories."
   [wallpapers]
-  (let [config (config/restore)]
-    (remove (set (history/restore)) (remove #(.isDirectory (io/file %)) wallpapers))))
+  (let [config (config/restore!)]
+    (remove (set (history/restore!)) (remove #(.isDirectory (io/file %)) wallpapers))))
 
-(defn weight
+(defn weight!
   "Applies a weight for the given wallpaper based on the mtime of the file.
 
   Arguments:
@@ -44,7 +44,7 @@
   [wallpaper]
   (let [now (quot (System/currentTimeMillis) 1000)
         mtime (quot (.lastModified (io/file wallpaper)) 1000)
-        config (config/restore)]
+        config (config/restore!)]
     (when-let [weight (some->>
                        (keys (:weights config))
                        (filter #(< (- now %) mtime))
@@ -59,57 +59,57 @@
   - wallpapers (seq): All wallpapers that we would like to weight."
   [wallpapers]
   (mapcat (fn [wallpaper]
-            (let [config (config/restore)
-                  w (or (weight wallpaper) 1)]
+            (let [config (config/restore!)
+                  w (or (weight! wallpaper) 1)]
               (repeat w wallpaper)))
           wallpapers))
 
-(defn random
+(defn random!
   "Get a random wallpaper from a list of wallpapers filtering out previously displayed papers and applying
   weighting to favor new images."
   []
-  (let [config (config/restore)
-        sources (category/all)
+  (let [config (config/restore!)
+        sources (category/all!)
         dirs (dirs sources)
         wallpapers (gather dirs)
-        filtered-wallpapers (prune wallpapers)
+        filtered-wallpapers (prune! wallpapers)
         effective-wallpapers (if (seq filtered-wallpapers)
                                filtered-wallpapers
                                (do
-                                 (history/clear)
+                                 (history/clear!)
                                  wallpapers))
         weighted-wallpapers (apply-weights effective-wallpapers)]
     (first (shuffle (vec weighted-wallpapers)))))
 
-(defn record
+(defn record!
   "Records the current wallpaper as the previous, sets the new current
   to the passed image, records the passed image in the history.
 
   Arguments:
   - wallpaper (String): Path to an image file that was used."
   [wallpaper]
-  (history/set-previous)
-  (history/set-current wallpaper)
-  (history/record wallpaper))
+  (history/set-previous!)
+  (history/set-current! wallpaper)
+  (history/record! wallpaper))
 
-(defn display-fullscreen
+(defn display-fullscreen!
   "Displays the provided wallpaper over the entire root window.
 
   Arguments:
   - wallpaper (String): Path to image file to display."
   [wallpaper]
-  (let [config (config/restore)
+  (let [config (config/restore!)
         setter (:path (:setter config))
         args (:full (:opts (:setter config)))]
     (sh setter args wallpaper)))
 
-(defn display-tiled
+(defn display-tiled!
   "Displayes the provided wallpaper tiled over the entire root window.
 
   Arguments:
   - wallpaper (String): Path to image file to display."
   [wallpaper]
-  (let [config (config/restore)
+  (let [config (config/restore!)
         setter (:path (:setter config))
         args (:tiled (:opts (:setter config)))]
     (sh setter args wallpaper)))

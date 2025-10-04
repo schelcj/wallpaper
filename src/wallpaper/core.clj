@@ -1,7 +1,7 @@
 ;; TODO
-;; - not following naming conventions for functions with side-effects, should rename things
 ;; - write all the tests
 ;; - write wrapper to run the jar file
+;; - write introduction in the doc directory (probably should have started there to begin with...)
 ;;
 ;; - experiment with github actions to run tests and builds for binary downloads
 (ns wallpaper.core
@@ -41,7 +41,7 @@
 
 (defn -main
   [& args]
-  (let [config (config/restore)
+  (let [config (config/restore!)
         {:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (cond
       (seq errors)
@@ -56,7 +56,7 @@
         (println "Initialization complete now set the wallpaper path in the config file:")
         (println "Default configuration path: " (config/default-config-path))
         (System/exit 0))
-      (not (seq (category/all)))
+      (not (seq (category/all!)))
       (do
         (println "No categories defined yet!")
         (println "use --add-category to get started")
@@ -65,7 +65,7 @@
         (System/exit 1))
       (:current options)
       (do
-        (println (history/get-current))
+        (println (history/get-current!))
         (System/exit 0))
       (:lock options)
       (do
@@ -76,7 +76,7 @@
         (.delete (io/file (:lock-file config))))
       (:category options)
       (do
-        (category/record (:category options)))
+        (category/record! (:category options)))
       (:add-category options)
       (do
         (category/add-category! (:add-category options))
@@ -87,7 +87,7 @@
         (System/exit 0))
       (:list-categories options)
       (do
-        (category/show-categories)
+        (category/show-categories!)
         (System/exit 0))
       (:dump-cache options)
       (do
@@ -95,26 +95,26 @@
         (System/exit 0))
       (:flush-cache options)
       (do
-        (history/clear)
+        (history/clear!)
         (System/exit 0))
       (:previous options)
       (do
-        (let [wallpaper (history/get-previous)]
-          (papers/display-fullscreen wallpaper))
+        (let [wallpaper (history/get-previous!)]
+          (papers/display-fullscreen! wallpaper))
         (System/exit 0))
       (:image options)
       (do
         (let [wallpaper (:image options)]
-          (papers/display-fullscreen wallpaper))
+          (papers/display-fullscreen! wallpaper))
         (System/exit 0))
       (:tile options)
       (do
         (let [wallpaper (:tile options)]
-          (papers/display-tiled wallpaper))
+          (papers/display-tiled! wallpaper))
         (System/exit 0))
       (:clear options)
       (do
-        (category/clear)
+        (category/clear!)
         (System/exit 0))
       (:help options)
       (do
@@ -124,8 +124,8 @@
     (let [lock (io/file (:lock-file config))]
       (if (.exists lock)
         (System/exit 1)
-        (let [wallpaper (papers/random)]
-          (papers/display-fullscreen wallpaper)
-          (papers/record wallpaper)))))
+        (let [wallpaper (papers/random!)]
+          (papers/display-fullscreen! wallpaper)
+          (papers/record! wallpaper)))))
 
   (System/exit 0))

@@ -40,7 +40,7 @@
      :setter {:path setter :opts {:full "-f" :tiled "-t"}}
      :weights {86400 1000 604800 500 2592000 200}}))
 
-(defn restore
+(defn restore!
   "Load the configuration file from disk and merge with the default configuration settings."
   []
   (let [config (if (.exists config-file)
