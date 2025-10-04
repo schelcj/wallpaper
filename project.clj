@@ -8,5 +8,7 @@
                  [org.clojure/tools.cli "1.1.230"]
                  [ahungry/xdg-rc "0.0.4"]]
   :main wallpaper.core
+  :plugins [[lein-binplus "0.6.6"]]
+  :bin {:name "wallpaper"}
   :repl-options {:init-ns wallpaper.core}
   :aot [wallpaper.core])
