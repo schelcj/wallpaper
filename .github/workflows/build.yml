@@ -42,13 +42,17 @@ jobs:
         run: lein test
 
       # 6. Build uberjar
-      # - name: Build uberjar
-      #   run: lein uberjar
+      - name: Build uberjar
+        run: lein uberjar
 
-      # 7. Upload uberjar as release asset
+      # 7. Build wrapper
+      - name: Build binary
+        run: lein bin
+
+      # 8. Upload uberjar as release asset
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: target/*.jar
+          files: target/*.jar target/wallpaper
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
