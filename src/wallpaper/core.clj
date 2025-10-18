@@ -1,14 +1,3 @@
-;; TODO
-;; - write all the tests
-;; - add arg to show the weighting of the current wallpaper
-;; - add arg to show stats of wallpapers displayed by category (including how many displayed by category and total)
-;; - detect overall brightness and or tone to favor darker and warmer images if desired
-;;
-;; - write introduction in the doc directory (probably should have started there to begin with...)
-;; - write getting started section in readme
-;; - write example of running in crontab export the display env var
-;;
-;; - experiment with github actions to run tests and builds for binary downloads
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
   (:require [wallpaper.config :as config])
@@ -33,6 +22,7 @@
    ["-r" "--clear" "Clear the previous wallpaper category"]
    ["-I" "--init" "Initialize caching and configuration files"]
    ["-C" "--current" "Show the currently display wallpaper path"]
+   ["-W" "--show-weight" "Show the weight of the current wallpaper"]
    ["-h" "--help" "Show help"]])
 
 (defn usage [options-summary]
@@ -120,6 +110,13 @@
       (:clear options)
       (do
         (category/clear!)
+        (System/exit 0))
+      (:show-weight options)
+      (do
+        (let [current (history/get-current!)
+              weight (papers/weight! current)
+              relative-path (history/get-current-relative-path)]
+          (println (format "%s: %d" relative-path weight)))
         (System/exit 0))
       (:help options)
       (do

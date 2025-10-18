@@ -2,10 +2,12 @@
 
 ## Features
 
-- [ ] add arg to show the weighting of the current wallpaper
+- [x] add arg to show the weighting of the current wallpaper _v0.1.1_
 - [ ] add arg to show stats of wallpapers displayed by category (including how many displayed by category and total)
 - [ ] detect overall brightness and or tone to favor darker and warmer images if desired
 - [ ] handle app-name more generically so a rename is easier
+- [ ] store metadata on the score of the wallpaper when displayed, could include the mtime at the time dispalyed as well
+- [ ] add arg to display the version number
 
 ## Documentation
 
