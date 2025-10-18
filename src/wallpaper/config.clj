@@ -8,6 +8,12 @@
 ;; TODO - naming things is hard...
 (def app-name "wallpaper")
 
+;; TODO - maybe a way to change the XDG values for testing?
+;; (maybe i'm just doing this all wrong?)
+;; (defn app-mode
+;;   []
+;;   (println (System/getProperty "app.mode")))
+
 (def config-file
   "Where the default config file lives on disk."
   (io/file (xdg-config-dir app-name) "config.edn"))
