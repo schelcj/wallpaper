@@ -7,7 +7,7 @@
 - [ ] detect overall brightness and or tone to favor darker and warmer images if desired
 - [ ] handle app-name more generically so a rename is easier
 - [ ] store metadata on the score of the wallpaper when displayed, could include the mtime at the time dispalyed as well
-- [ ] add arg to display the version number
+- [x] add arg to display the version number
 
 ## Documentation
 
@@ -15,11 +15,13 @@
 - [ ] write getting started section in readme
 - [ ] write example of running in crontab export the display env var
 - [ ] update doc strings to explain why side-effects
+- [ ] document using the binary wrapper from the release build
 
 ## Deployment
 
-- [ ] settle on versions so actions will work
-- [ ] github action to create uberjar and standalone executable
+- [x] settle on versions so actions will work
+- [x] github action to create uberjar and standalone executable
+- [ ] create new workflow for just building and running tests
 
 ## Tests
 
