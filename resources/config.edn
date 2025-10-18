@@ -43,9 +43,9 @@
  ;; - weight: number of times to repeat the image
  ;;           in the list of possible wallpapers
  ;; :weights {
- ;;   86400   1000
- ;;   604800  500
- ;;   2592000 200
+ ;;   86400   1000 ;; 1 days
+ ;;   604800  500  ;; 7 days
+ ;;   2592000 200  ;; 30 days
  ;; }
 
  ;; Path and options for the setter utilitity. I'm still
