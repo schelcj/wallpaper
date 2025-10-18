@@ -1,12 +1,13 @@
-name: Clojure CI
+name: Release wallpaper
 
 on:
   push:
     tags:
       - 'v*'
-  pull_request:
-    branches: [ "main" ]
 
+permissions:
+  contents: write
+  
 jobs:
   build:
     runs-on: ubuntu-latest
