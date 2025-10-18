@@ -1,7 +1,12 @@
 ;; TODO
 ;; - write all the tests
-;; - write wrapper to run the jar file
+;; - add arg to show the weighting of the current wallpaper
+;; - add arg to show stats of wallpapers displayed by category (including how many displayed by category and total)
+;; - detect overall brightness and or tone to favor darker and warmer images if desired
+;;
 ;; - write introduction in the doc directory (probably should have started there to begin with...)
+;; - write getting started section in readme
+;; - write example of running in crontab export the display env var
 ;;
 ;; - experiment with github actions to run tests and builds for binary downloads
 (ns wallpaper.core
