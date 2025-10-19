@@ -57,8 +57,7 @@
 (defn init!
   "Create all the initial configuration, cache, and state files and directories"
   []
-  (let [defaults (construct)
-        config (-> (io/resource "config.edn") slurp edn/read-string)]
+  (let [defaults (construct)]
     (.mkdirs (io/file (xdg-data-dir app-name)))
     (.mkdirs (io/file (xdg-cache-dir app-name)))
     (.mkdirs (io/file (xdg-config-dir app-name)))
@@ -74,3 +73,13 @@
       (with-open [in (io/input-stream (io/resource "config.edn"))
                   out (io/output-stream config-file)]
         (io/copy in out)))))
+
+(defn init?
+  "Has the configuration be initialized?"
+  []
+  (let [defaults (construct)]
+       (and (.exists (io/file (:sources defaults)))
+            (.exists (io/file (:current defaults)))
+            (.exists (io/file (:previous defaults)))
+            (.exists (io/file (:history defaults)))
+            (.exists (io/file config-file)))))

@@ -8,6 +8,10 @@
 - [ ] handle app-name more generically so a rename is easier
 - [ ] store metadata on the score of the wallpaper when displayed, could include the mtime at the time dispalyed as well
 - [x] add arg to display the version number
+- [x] guard against running without using `--init`
+- [ ] add arg to uninstall to cleanup
+- [ ] do not let stack traces go to the user
+- [ ] add a constants class for name and version for starters
 
 ## Documentation
 

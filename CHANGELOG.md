@@ -6,6 +6,10 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Fixed
+
+- prevent errors on first run before `--init` is ran
+
 ## [0.1.1]
 
 ### ADDED

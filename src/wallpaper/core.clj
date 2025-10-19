@@ -39,11 +39,19 @@
   (let [config (config/restore!)
         {:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (cond
+      (:help options)
+      (do
+        (println (usage summary))
+        (System/exit 0))
       (seq errors)
       (do
         (println errors)
         (println)
         (println (usage summary))
+        (System/exit 1))
+      (not (config/init?))
+      (do
+        (println "Wallpaper configuration has not been initialized. Please run with --init.")
         (System/exit 1))
       (:init options)
       (do
@@ -117,10 +125,6 @@
               weight (papers/weight! current)
               relative-path (history/get-current-relative-path)]
           (println (format "%s: %d" relative-path weight)))
-        (System/exit 0))
-      (:help options)
-      (do
-        (println (usage summary))
         (System/exit 0)))
 
     (let [lock (io/file (:lock-file config))]
