@@ -6,6 +6,8 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2025-10-19
+
 ### Added
 
 - constants namespace to define name and version in a single place

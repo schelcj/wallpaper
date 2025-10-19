@@ -28,8 +28,7 @@
    ["-h" "--help" "Show help"]])
 
 (defn usage [options-summary]
-  (->> ["wallpaper"
-        ""
+  (->> [""
         "Usage: wallpaper [options]"
         ""
         "Options:"
@@ -43,6 +42,7 @@
     (cond
       (:help options)
       (do
+        (println const/APP_NAME const/VERSION)
         (println (usage summary))
         (System/exit 0))
       (seq errors)
