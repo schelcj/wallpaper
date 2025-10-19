@@ -1,12 +1,10 @@
 (ns wallpaper.config
   "Functions for accessing the configuration settings."
+  (:require [wallpaper.constants :as const])
   (:require [clojure.edn :as edn])
   (:require [clojure.java.io :as io])
   (:require [xdg-rc.core :refer :all])
   (:gen-class))
-
-;; TODO - naming things is hard...
-(def app-name "wallpaper")
 
 ;; TODO - maybe a way to change the XDG values for testing?
 ;; (maybe i'm just doing this all wrong?)
@@ -16,7 +14,7 @@
 
 (def config-file
   "Where the default config file lives on disk."
-  (io/file (xdg-config-dir app-name) "config.edn"))
+  (io/file (xdg-config-dir const/APP_NAME) "config.edn"))
 
 (defn default-config-path
   "Path to the default configuration file."
@@ -28,13 +26,13 @@
   See the default configuration file in `resources/config.edn` for more details
   of each setting and the default value."
   []
-  (let [lock (str (io/file (xdg-data-dir app-name) "lock"))
+  (let [lock (str (io/file (xdg-data-dir const/APP_NAME) "lock"))
         wallpapers-dir (str (io/file (System/getenv "HOME") "Dropbox" "Wallpapers"))
-        sources (str (io/file (xdg-data-dir app-name) "sources.edn"))
-        current (str (io/file (xdg-data-dir app-name) "current.edn"))
-        previous (str (io/file (xdg-data-dir app-name) "previous.edn"))
-        category (str (io/file (xdg-data-dir app-name) "category.edn"))
-        history (str (io/file (xdg-cache-dir app-name) "history.edn"))
+        sources (str (io/file (xdg-data-dir const/APP_NAME) "sources.edn"))
+        current (str (io/file (xdg-data-dir const/APP_NAME) "current.edn"))
+        previous (str (io/file (xdg-data-dir const/APP_NAME) "previous.edn"))
+        category (str (io/file (xdg-data-dir const/APP_NAME) "category.edn"))
+        history (str (io/file (xdg-cache-dir const/APP_NAME) "history.edn"))
         setter (str (io/file (System/getenv "HOME") "bin" "fbsetbg"))]
     {:lock-file lock
      :wallpapers-dir wallpapers-dir
@@ -58,9 +56,9 @@
   "Create all the initial configuration, cache, and state files and directories"
   []
   (let [defaults (construct)]
-    (.mkdirs (io/file (xdg-data-dir app-name)))
-    (.mkdirs (io/file (xdg-cache-dir app-name)))
-    (.mkdirs (io/file (xdg-config-dir app-name)))
+    (.mkdirs (io/file (xdg-data-dir const/APP_NAME)))
+    (.mkdirs (io/file (xdg-cache-dir const/APP_NAME)))
+    (.mkdirs (io/file (xdg-config-dir const/APP_NAME)))
     (when-not (.exists (io/file (:sources defaults)))
       (spit (io/file (:sources defaults)) ()))
     (when-not (.exists (io/file (:current defaults)))

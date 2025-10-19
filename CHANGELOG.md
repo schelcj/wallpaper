@@ -2,23 +2,27 @@
 
 All notable changes to this project will be documented
 in this file. This change log follows the conventions
-of [keepachangelog.com](http://keepachangelog.com/).
+of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleased]
+
+### Added
+
+- constants namespace to define name and version in a single place
 
 ### Fixed
 
 - prevent errors on first run before `--init` is ran
 
-## [0.1.1]
+## [0.1.1] - 2025-10-18
 
-### ADDED
+### Added
 
 - added the `lein-binplus` plugin to build a binary wrapper
 - added [TODOs](./TODO.md) to track what i want to do next
 - added `--show-weight` command line option to show the score of the current wallpaper
 
-### CHANGED
+### Changed
 
 - Completed [README](./README.md)
 - Completed this initial Changelog
@@ -32,8 +36,9 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 - Order of argument parsing for `--init` on first run
 
-## [0.1.0]
+## [0.1.0] - 2025-10-05
 
-Initial _"release"_ wherein most everything works well enough for my uses...
+Initial _"release"_ wherein most everything works well enough for my uses.
+There was never an actual `0.1.0` release/tag.
 
 [Unreleased]: https://github.com/schelcj/wallpaper/tree/main

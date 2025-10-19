@@ -3,6 +3,7 @@
   (:require [wallpaper.config :as config])
   (:require [wallpaper.category :as category])
   (:require [wallpaper.papers :as papers])
+  (:require [wallpaper.constants :as const])
   (:require [clojure.tools.cli :refer [parse-opts]])
   (:require [clojure.java.io :as io])
   (:gen-class))
@@ -23,6 +24,7 @@
    ["-I" "--init" "Initialize caching and configuration files"]
    ["-C" "--current" "Show the currently display wallpaper path"]
    ["-W" "--show-weight" "Show the weight of the current wallpaper"]
+   ["-V" "--version" "Show version number"]
    ["-h" "--help" "Show help"]])
 
 (defn usage [options-summary]
@@ -125,6 +127,10 @@
               weight (papers/weight! current)
               relative-path (history/get-current-relative-path)]
           (println (format "%s: %d" relative-path weight)))
+        (System/exit 0))
+      (:version options)
+      (do
+        (println const/APP_NAME const/VERSION)
         (System/exit 0)))
 
     (let [lock (io/file (:lock-file config))]

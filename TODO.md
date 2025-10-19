@@ -5,13 +5,13 @@
 - [x] add arg to show the weighting of the current wallpaper _v0.1.1_
 - [ ] add arg to show stats of wallpapers displayed by category (including how many displayed by category and total)
 - [ ] detect overall brightness and or tone to favor darker and warmer images if desired
-- [ ] handle app-name more generically so a rename is easier
+- [x] handle app-name more generically so a rename is easier
 - [ ] store metadata on the score of the wallpaper when displayed, could include the mtime at the time dispalyed as well
 - [x] add arg to display the version number
 - [x] guard against running without using `--init`
 - [ ] add arg to uninstall to cleanup
 - [ ] do not let stack traces go to the user
-- [ ] add a constants class for name and version for starters
+- [x] add a constants class for name and version for starters
 
 ## Documentation
 
