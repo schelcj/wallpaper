@@ -1,4 +1,4 @@
-# Change Log
+# Change Lo
 
 All notable changes to this project will be documented
 in this file. This change log follows the conventions
@@ -9,6 +9,7 @@ of [keepachangelog.com](https://keepachangelog.com/).
 ### Added
 
 - constants namespace to define name and version in a single place
+- added a `--version` argument
 
 ### Fixed
 
