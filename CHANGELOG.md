@@ -6,6 +6,11 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Changed
+
+- printing to STDOUT only from the core namespace during arg parsing
+- changed the short-opts for a few args and dropped the short opts from others
+
 ## [0.1.2] - 2025-10-19
 
 ### Added
