@@ -3,7 +3,6 @@
   (:require [wallpaper.config :as config])
   (:require [clojure.edn :as edn])
   (:require  [clojure.java.io :as io])
-  (:require [clojure.pprint :refer [pprint]])
   (:gen-class))
 
 (defn restore!
@@ -23,12 +22,6 @@
   (let [config (config/restore!)
         wallpapers (restore!)]
     (spit (:history config) (pr-str (cons wallpaper wallpapers)))))
-
-(defn dump
-  "Print the contents of the history to STDOUT."
-  []
-  (let [config (config/restore!)]
-    (pprint (edn/read-string (slurp (:history config))))))
 
 (defn clear!
   "Clear the history contents to start over."

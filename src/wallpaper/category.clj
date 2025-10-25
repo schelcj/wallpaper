@@ -3,7 +3,6 @@
   (:require [wallpaper.config :as config])
   (:require [clojure.java.io :as io])
   (:require [clojure.edn :as edn])
-  (:require [clojure.pprint :refer [pprint]])
   (:gen-class))
 
 (defn all!
@@ -56,8 +55,8 @@
         sources (edn/read-string (slurp (:sources config)))]
     (spit (:sources config) (pr-str (filter #(not= category %) sources)))))
 
-(defn show-categories!
-  "Show the currently configured sources that will be used in random selection."
+(defn get-categories
+  "Return the list of categories current configured that will be used in the random selection."
   []
   (let [config (config/restore!)]
-    (pprint (edn/read-string (slurp (:sources config))))))
+    (edn/read-string (slurp (:sources config)))))

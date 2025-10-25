@@ -5,6 +5,7 @@
   (:require [wallpaper.papers :as papers])
   (:require [wallpaper.constants :as const])
   (:require [clojure.tools.cli :refer [parse-opts]])
+  (:require [clojure.pprint :refer [pprint]])
   (:require [clojure.java.io :as io])
   (:gen-class))
 
@@ -12,9 +13,9 @@
   [["-c" "--category CATEGORY" "Wallpaper category"]
    ["-a" "--add-category CATEGORY" "Add category to the selection list"]
    ["-d" "--del-category CATEGORY" "Remove category from the selection list"]
-   ["-L" "--list-categories" "Print all configured categories to STDOUT"]
+   ["-C" "--show-categories" "Print all configured categories to STDOUT"]
    ["-F" "--flush-cache" "Flush the wallpaper history cache"]
-   ["-D" "--dump-cache" "Print current wallpaper history cache to STDOUT"]
+   ["-S" "--show-cache" "Print current wallpaper history cache to STDOUT"]
    ["-l" "--lock" "Lock the current wallpaper"]
    ["-u" "--unlock" "Unlock the current wallpaper"]
    ["-p" "--previous" "Set the wallpaper to the previous image"]
@@ -22,8 +23,8 @@
    ["-t" "--tile TILE" "Tiled the provided image as the wallpaper"]
    ["-r" "--clear" "Clear the previous wallpaper category"]
    ["-I" "--init" "Initialize caching and configuration files"]
-   ["-C" "--current" "Show the currently display wallpaper path"]
-   ["-W" "--show-weight" "Show the weight of the current wallpaper"]
+   [nil "--current" "Show the currently display wallpaper path"]
+   [nil "--show-weight" "Show the weight of the current wallpaper"]
    ["-V" "--version" "Show version number"]
    ["-h" "--help" "Show help"]])
 
@@ -90,13 +91,13 @@
       (do
         (category/del-category! (:del-category options))
         (System/exit 0))
-      (:list-categories options)
+      (:show-categories options)
       (do
-        (category/show-categories!)
+        (pprint (category/get-categories))
         (System/exit 0))
-      (:dump-cache options)
+      (:show-cache options)
       (do
-        (history/dump)
+        (pprint (history/restore!))
         (System/exit 0))
       (:flush-cache options)
       (do
