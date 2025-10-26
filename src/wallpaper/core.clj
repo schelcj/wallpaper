@@ -3,6 +3,7 @@
   (:require [wallpaper.config :as config])
   (:require [wallpaper.category :as category])
   (:require [wallpaper.papers :as papers])
+  (:require [wallpaper.stats :as stats])
   (:require [wallpaper.constants :as const])
   (:require [clojure.tools.cli :refer [parse-opts]])
   (:require [clojure.pprint :refer [pprint]])
@@ -25,6 +26,7 @@
    ["-I" "--init" "Initialize caching and configuration files"]
    [nil "--current" "Show the currently display wallpaper path"]
    [nil "--show-weight" "Show the weight of the current wallpaper"]
+   [nil "--stats" "Show various stats for the wallpaper library"]
    ["-V" "--version" "Show version number"]
    ["-h" "--help" "Show help"]])
 
@@ -122,11 +124,15 @@
       (do
         (category/clear!)
         (System/exit 0))
+      (:stats options)
+      (do
+        (pprint (stats/overall))
+        (System/exit 0))
       (:show-weight options)
       (do
         (let [current (history/get-current!)
               weight (papers/weight! current)
-              relative-path (history/get-current-relative-path)]
+              relative-path (history/get-relative-path current)]
           (println (format "%s: %d" relative-path weight)))
         (System/exit 0))
       (:version options)
