@@ -25,16 +25,16 @@
   (loop [dirs dirs result []]
     (if (empty? dirs)
       (apply concat result)
-      (recur (rest dirs) (conj result (map #(.getPath %) (file-seq (first dirs))))))))
+      (recur (rest dirs) (conj result (map #(.getPath %) (remove #(.isDirectory %) (file-seq (first dirs)))))))))
 
 (defn prune!
-  "Build seq of wallpapers fitlering out previously displayed wallpapers and directories.
+  "Build seq of wallpapers fitlering out previously displayed wallpapers.
 
   Arguments:
   - wallpapers (seq): All wallpapers that were found for the given categories."
   [wallpapers]
   (let [config (config/restore!)]
-    (remove (set (history/restore!)) (remove #(.isDirectory (io/file %)) wallpapers))))
+    (remove (set (history/restore!)) wallpapers)))
 
 (defn weight!
   "Applies a weight for the given wallpaper based on the mtime of the file.
