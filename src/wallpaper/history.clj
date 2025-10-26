@@ -59,8 +59,8 @@
   (let [config (config/restore!)]
     (edn/read-string (slurp (:previous config)))))
 
-(defn get-current-relative-path
-  "Gets the current wallpaper relative to the base directory"
-  []
+(defn get-relative-path
+  "Gets a wallpapers path relative to the base directory (i.e. the category)."
+  [path]
   (let [config (config/restore!)]
-    (subs (get-current!) (inc (count (:wallpapers-dir config))))))
+    (subs path (inc (count (:wallpapers-dir config))))))
