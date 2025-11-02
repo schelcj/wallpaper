@@ -6,7 +6,7 @@
   (:require [wallpaper.stats :as stats])
   (:require [wallpaper.constants :as const])
   (:require [clojure.tools.cli :refer [parse-opts]])
-  (:require [clojure.pprint :refer [pprint]])
+  (:require [clojure.pprint :refer [pprint print-table]])
   (:require [clojure.java.io :as io])
   (:gen-class))
 
@@ -126,7 +126,29 @@
         (System/exit 0))
       (:stats options)
       (do
-        (pprint (stats/overall))
+        (let [totals (stats/overall)
+              available (:total-wallpapers-available-by-category totals)
+              displayed (:total-wallpapers-displayed-by-category totals)
+              summary   (for [[cat total] available
+                              :let [shown (get displayed cat 0)
+                                    remain (- total shown)
+                                    pct (double (* 100 (/ shown total)))]]
+                          {:category cat
+                           :available total
+                           :displayed shown
+                           :remaining remain
+                           :percent (format "%.1f%%" pct)})
+              total-available (:total-wallpapers-available totals)
+              total-displayed (:total-wallpapers-displayed totals)
+              totals {:category "TOTAL"
+                      :available total-available
+                      :displayed total-displayed
+                      :remaining (- total-available total-displayed)
+                      :percent (format "%.1f%%" (double (* 100 (/ total-displayed total-available))))}
+              separator {:category "----" :available "" :displayed "" :remaining "" :percent ""}
+              results (conj (vec (reverse (sort-by :percent summary))) separator totals)]
+          (print-table [:category :available :displayed :remaining :percent] results))
+
         (System/exit 0))
       (:show-weight options)
       (do

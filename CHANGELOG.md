@@ -6,10 +6,18 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.1.3] - 2025-11-02
+
 ### Changed
 
 - printing to STDOUT only from the core namespace during arg parsing
 - changed the short-opts for a few args and dropped the short opts from others
+- move directory filtering to the gather function instead of the prune function
+
+### Added
+
+- stats namespace to begin providing some info on what's been displayed and such
+- stats output option `--stats` that prints a table of categories, counts of displayed/available, and percentages.
 
 ## [0.1.2] - 2025-10-19
 
