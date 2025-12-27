@@ -21,7 +21,6 @@
    ["-u" "--unlock" "Unlock the current wallpaper"]
    ["-p" "--previous" "Set the wallpaper to the previous image"]
    ["-i" "--image IMAGE" "Set the provided image as the current wallpaper"]
-   ["-t" "--tile TILE" "Tiled the provided image as the wallpaper"]
    ["-r" "--clear" "Clear the previous wallpaper category"]
    ["-I" "--init" "Initialize caching and configuration files"]
    [nil "--current" "Show the currently display wallpaper path"]
@@ -108,17 +107,12 @@
       (:previous options)
       (do
         (let [wallpaper (history/get-previous!)]
-          (papers/display-fullscreen! wallpaper))
+          (papers/display! wallpaper))
         (System/exit 0))
       (:image options)
       (do
         (let [wallpaper (:image options)]
-          (papers/display-fullscreen! wallpaper))
-        (System/exit 0))
-      (:tile options)
-      (do
-        (let [wallpaper (:tile options)]
-          (papers/display-tiled! wallpaper))
+          (papers/display! wallpaper))
         (System/exit 0))
       (:clear options)
       (do
@@ -166,7 +160,7 @@
       (if (.exists lock)
         (System/exit 1)
         (let [wallpaper (papers/random!)]
-          (papers/display-fullscreen! wallpaper)
+          (papers/display! wallpaper)
           (papers/record! wallpaper)))))
 
   (System/exit 0))

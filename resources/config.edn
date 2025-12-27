@@ -7,6 +7,10 @@
  ;; choosing).
  ;; :wallpapers-dir "$HOME/Dropbox/Wallpapers"
 
+ ;; Top level directory where tiles are kept.
+ ;; No subcategories for tiles (i.e. all in a single top-level directory).
+ ;; :tiles-dir "$HOME/Dropbox/Wallpapers/Tiles"
+
  ;; Where to store the category to that limits
  ;; random selection to.
  ;; :category-file '$XDG_DATA_DIR/wallpaper/category.edn'

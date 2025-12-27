@@ -5,6 +5,7 @@
   (:require [wallpaper.history :as history])
   (:require [clojure.java.io :as io])
   (:require [clojure.java.shell :refer [sh]])
+  (:require [clojure.string :as s])
   (:gen-class))
 
 (defn dirs
@@ -92,24 +93,17 @@
   (history/set-current! wallpaper)
   (history/record! wallpaper))
 
-(defn display-fullscreen!
-  "Displays the provided wallpaper over the entire root window.
+(defn display!
+  "Displays the provided wallpaper or tile over the entire root window.
 
   Arguments:
-  - wallpaper (String): Path to image file to display."
+  - wallaper (String): Path to the image, or tile, to display."
   [wallpaper]
   (let [config (config/restore!)
+        is_tile (s/starts-with? wallpaper (:tiles-dir config))
         setter (:path (:setter config))
-        args (:full (:opts (:setter config)))]
-    (sh setter args wallpaper)))
-
-(defn display-tiled!
-  "Displayes the provided wallpaper tiled over the entire root window.
-
-  Arguments:
-  - wallpaper (String): Path to image file to display."
-  [wallpaper]
-  (let [config (config/restore!)
-        setter (:path (:setter config))
-        args (:tiled (:opts (:setter config)))]
+        args (if is_tile
+               (:tiled (:opts (:setter config)))
+               (:full (:opts (:setter config))))
+        ]
     (sh setter args wallpaper)))

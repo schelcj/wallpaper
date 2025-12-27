@@ -28,6 +28,7 @@
   []
   (let [lock (str (io/file (xdg-data-dir const/APP_NAME) "lock"))
         wallpapers-dir (str (io/file (System/getenv "HOME") "Dropbox" "Wallpapers"))
+        tiles-dir (str (io/file (System/getenv "HOME") "Dropbox" "Wallpapers" "Tiles"))
         sources (str (io/file (xdg-data-dir const/APP_NAME) "sources.edn"))
         current (str (io/file (xdg-data-dir const/APP_NAME) "current.edn"))
         previous (str (io/file (xdg-data-dir const/APP_NAME) "previous.edn"))
@@ -36,6 +37,7 @@
         setter (str (io/file (System/getenv "HOME") "bin" "fbsetbg"))]
     {:lock-file lock
      :wallpapers-dir wallpapers-dir
+     :tiles-dir tiles-dir
      :current current
      :previous previous
      :category-file category

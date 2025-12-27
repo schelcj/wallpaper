@@ -6,6 +6,18 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.1.4] - 2025-12-27
+
+### Changed
+
+- reworked tiling support so that they can be included in the random selection
+- new configuration file param `:tiles-dir` to specify where tiles live
+
+### Removed
+
+- dropped the `--tile` option now that `--image` and random selection will detect a tile
+- `wallpaper.papers/display-fullscreen!` and `wallpaper.papers/display-tiled!` removed and replaced with a single `wallpaper.papers/display!` that detects if the image is a tile or not _(currently only by looking at the path of the image compared to the configured tiles directory)_.
+
 ## [0.1.3] - 2025-11-02
 
 ### Changed
