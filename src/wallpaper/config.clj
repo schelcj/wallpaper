@@ -3,6 +3,8 @@
   (:require [wallpaper.constants :as const])
   (:require [clojure.edn :as edn])
   (:require [clojure.java.io :as io])
+  (:require [clojure.string :as s])
+  (:require [clojure.walk :as walk])
   (:require [xdg-rc.core :refer :all])
   (:gen-class))
 
@@ -21,43 +23,55 @@
   []
   (str config-file))
 
-(defn construct
-  "Creates a map of all the default configuration file locations for caching and such.
-  See the default configuration file in `resources/config.edn` for more details
-  of each setting and the default value."
+(defn placeholder-paths
+  "Creates a map of the default paths for XDG values and HOME.
+  The map consists of essentially template variable placeholders
+  for the values that we need to replace with xdg values and env
+  vars such as `$HOME`. The format is `{{var_name}} path`. For
+  example:
+
+  {{home}}          (System/getenv HOME)
+  {{xdg-data-dir}}  (xdg-data-dir const/APP_NAME)
+  {{xdg-cache-dir}} (xdg-cache-dir const/APP_NAME)"
   []
-  (let [lock (str (io/file (xdg-data-dir const/APP_NAME) "lock"))
-        wallpapers-dir (str (io/file (System/getenv "HOME") "Dropbox" "Wallpapers"))
-        tiles-dir (str (io/file (System/getenv "HOME") "Dropbox" "Wallpapers" "Tiles"))
-        sources (str (io/file (xdg-data-dir const/APP_NAME) "sources.edn"))
-        current (str (io/file (xdg-data-dir const/APP_NAME) "current.edn"))
-        previous (str (io/file (xdg-data-dir const/APP_NAME) "previous.edn"))
-        category (str (io/file (xdg-data-dir const/APP_NAME) "category.edn"))
-        history (str (io/file (xdg-cache-dir const/APP_NAME) "history.edn"))
-        setter (str (io/file (System/getenv "HOME") "bin" "fbsetbg"))]
-    {:lock-file lock
-     :wallpapers-dir wallpapers-dir
-     :tiles-dir tiles-dir
-     :current current
-     :previous previous
-     :category-file category
-     :history history
-     :sources sources
-     :setter {:path setter :opts {:full "-f" :tiled "-t"}}
-     :weights {86400 1000 604800 500 2592000 200}}))
+  (let [home (str (io/file (System/getenv "HOME")))
+        data-dir (str (io/file (xdg-data-dir const/APP_NAME)))
+        cache-dir (str (io/file (xdg-cache-dir const/APP_NAME)))]
+    {"{{home}}" home
+     "{{xdg-data-dir}}" data-dir
+     "{{xdg-cache-dir}}" cache-dir}))
+
+(defn apply-placeholders
+  "Takes the default configuration, walks through all the values and replaces the values
+  from `placeholder-paths`.
+
+  Arguments:
+  - config (map): default configuration to apply any placeholder replacements"
+  [config]
+  (let [replacements (placeholder-paths)]
+    (walk/postwalk
+     (fn [x]
+       (if (string? x)
+         (reduce (fn [s [from to]]
+                   (s/replace s from to))
+                 x
+                 replacements)
+         x))
+     config)))
 
 (defn restore!
   "Load the configuration file from disk and merge with the default configuration settings."
   []
-  (let [config (if (.exists config-file)
-                 (edn/read-string (slurp config-file))
-                 ())]
-    (conj (construct) config)))
+  (let [userconfig (if (.exists config-file)
+                     (edn/read-string (slurp config-file))
+                     ())
+        defaults (edn/read-string (slurp (io/resource "config.edn")))]
+    (merge (apply-placeholders defaults) userconfig)))
 
 (defn init!
   "Create all the initial configuration, cache, and state files and directories"
   []
-  (let [defaults (construct)]
+  (let [defaults (restore!)]
     (.mkdirs (io/file (xdg-data-dir const/APP_NAME)))
     (.mkdirs (io/file (xdg-cache-dir const/APP_NAME)))
     (.mkdirs (io/file (xdg-config-dir const/APP_NAME)))
@@ -77,9 +91,9 @@
 (defn init?
   "Has the configuration be initialized?"
   []
-  (let [defaults (construct)]
-       (and (.exists (io/file (:sources defaults)))
-            (.exists (io/file (:current defaults)))
-            (.exists (io/file (:previous defaults)))
-            (.exists (io/file (:history defaults)))
-            (.exists (io/file config-file)))))
+  (let [defaults (restore!)]
+    (and (.exists (io/file (:sources defaults)))
+         (.exists (io/file (:current defaults)))
+         (.exists (io/file (:previous defaults)))
+         (.exists (io/file (:history defaults)))
+         (.exists (io/file config-file)))))

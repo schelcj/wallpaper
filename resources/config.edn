@@ -1,39 +1,46 @@
-{
- ;; These are the default settings for the random wallpaper setter.
+{;; These are the default settings for the random wallpaper setter.
  ;; Use this file to override the defaults.
+
+ ;; Placeholders within this config file that will be replaced
+ ;; with their default values or overwritten in the users
+ ;; local config changes.
+ ;;
+ ;; - {{home}}          - your $HOME directory (defaults to /home/<username>)
+ ;; - {{xdg-data-dir}}  - the default $XDG_DATA_DIR variable path (defaults to $HOME/.local/share/<app_name>)
+ ;; - {{xdg-cache-dir}} - the default $XDG_CACHE_DIR variable path (defaults to $HOME/.cache/<app_name>)
 
  ;; Top level directory where wallpapers are kept
  ;; organized by category (i.e. directories of your
  ;; choosing).
- ;; :wallpapers-dir "$HOME/Dropbox/Wallpapers"
+ :wallpapers-dir "{{home}}/Dropbox/Wallpapers"
 
  ;; Top level directory where tiles are kept.
  ;; No subcategories for tiles (i.e. all in a single top-level directory).
- ;; :tiles-dir "$HOME/Dropbox/Wallpapers/Tiles"
+ :tiles-dir "{{home}}/Dropbox/Wallpapers/Tiles"
 
  ;; Where to store the category to that limits
  ;; random selection to.
- ;; :category-file '$XDG_DATA_DIR/wallpaper/category.edn'
+ :category-file "{{xdg-data-dir}}/category.edn"
 
  ;; A set of categories (i.e. directories) under the :wallpaper-dir
  ;; root directory to limit the selection to if no category
  ;; was specifically choosen with `--category`. For example; this prevents
  ;; displaying xmas images out of season or showing the Propaganda
  ;; tiles in a full screen mode without tiling.
- ;; :sources '$XDG_DATA_DIR/wallpaper/sources.edn'
+ :sources "{{xdg-data-dir}}/sources.edn"
 
  ;; Records all wallpapers that have been displayed previously
  ;; since the last cache flush.
- ;; :history '$XDG_CACHE_DIR/wallpaper/history.edn'
+ :history "{{xdg-cache-dir}}/history.edn"
 
  ;; Records the currently displayed wallpaper
- ;; :current '$XDG_DATA_DIR/wallpaper/current.edn'
+ :current "{{xdg-data-dir}}/current.edn"
 
  ;; Records the most recent displayed wallpaper
- ;; :previous '$XDG_DATA_DIR/wallpaper/previous.edn'
+ :previous "{{xdg-data-dir}}/previous.edn"
 
  ;; Lock file to prevent switching the wallpaper.
- ;; :lock-file '$XDG_DATA_DIR/wallpaper/lock'
+ :lock-file "{{xdg-data-dir}}/lock"
 
  ;; Weights to apply to favor newer images. The format is
  ;;
@@ -46,21 +53,21 @@
  ;; - age:    difference between mtime of the file and now
  ;; - weight: number of times to repeat the image
  ;;           in the list of possible wallpapers
- ;; :weights {
- ;;   86400   1000 ;; 1 days
- ;;   604800  500  ;; 7 days
- ;;   2592000 200  ;; 30 days
- ;; }
+ :weights {86400   1000 ;; 1 days
+           604800  500  ;; 7 days
+           2592000 200  ;; 30 days
+           }
 
  ;; Path and options for the setter utilitity. I'm still
  ;; using https://fluxbox.org/help/man-fbsetbg/ which relies
  ;; on `feh` under the hood. Include args for full and tiled
  ;; display.
- ;; :setter {
- ;;   :path "$HOME/bin/fbsetbg"
- ;;   :opts {
- ;;     :full "-f"
- ;;     :tiled "-t"
- ;;   }
- ;; }
-}
+ :setter {:path "{{home}}/bin/fbsetbg"
+          :opts {:full "-f"
+                 :tiled "-t"}}
+
+ ;; Path and options for the convert utility. This is primarily for
+ ;; imagemagick to convert to grayscale.
+ :converter {:path "/usr/bin/convert"
+             :opts {:input ""
+                    :output "-colorspace Gray -type Grayscale"}}}
