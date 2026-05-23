@@ -14,29 +14,29 @@
 ;;   []
 ;;   (println (System/getProperty "app.mode")))
 
-(def config-file
-  "Where the default config file lives on disk."
-  (io/file (xdg-config-dir const/APP_NAME) "config.edn"))
+(def config-dir
+  "Path to the XDG_CONFIG_DIR for this application (default: /home/$USER/.config/<app_name>)"
+  (xdg-config-dir const/APP_NAME))
 
-(defn default-config-path
-  "Path to the default configuration file."
-  []
-  (str config-file))
+(def cache-dir
+  "Path to the XDG_CACHE_DIR for this application (default: /home/$USER/.cache/<app_name>)"
+  (xdg-cache-dir const/APP_NAME))
+
+(def data-dir
+  "Path to the XDG_DATA_DIR for this application (default: /home/$USER/.local/share/<app_name>)"
+  (xdg-data-dir const/APP_NAME))
+
+(def config-file
+  "Where the users config file lives on disk (default: /home/$USER/.config/<app_name>/config.edn)"
+  (io/file (s/join "/" [config-dir "config.edn"])))
 
 (defn placeholder-paths
   "Creates a map of the default paths for XDG values and HOME.
   The map consists of essentially template variable placeholders
   for the values that we need to replace with xdg values and env
-  vars such as `$HOME`. The format is `{{var_name}} path`. For
-  example:
-
-  {{home}}          (System/getenv HOME)
-  {{xdg-data-dir}}  (xdg-data-dir const/APP_NAME)
-  {{xdg-cache-dir}} (xdg-cache-dir const/APP_NAME)"
+  vars such as `$HOME`. The format is `{{var_name}} path`."
   []
-  (let [home (str (io/file (System/getenv "HOME")))
-        data-dir (str (io/file (xdg-data-dir const/APP_NAME)))
-        cache-dir (str (io/file (xdg-cache-dir const/APP_NAME)))]
+  (let [home (str (io/file (System/getenv "HOME")))]
     {"{{home}}" home
      "{{xdg-data-dir}}" data-dir
      "{{xdg-cache-dir}}" cache-dir}))
@@ -66,15 +66,15 @@
                      (edn/read-string (slurp config-file))
                      ())
         defaults (edn/read-string (slurp (io/resource "config.edn")))]
-    (merge (apply-placeholders defaults) userconfig)))
+    (merge (apply-placeholders defaults) (apply-placeholders userconfig))))
 
 (defn init!
   "Create all the initial configuration, cache, and state files and directories"
   []
   (let [defaults (restore!)]
-    (.mkdirs (io/file (xdg-data-dir const/APP_NAME)))
-    (.mkdirs (io/file (xdg-cache-dir const/APP_NAME)))
-    (.mkdirs (io/file (xdg-config-dir const/APP_NAME)))
+    (.mkdirs (io/file data-dir))
+    (.mkdirs (io/file cache-dir))
+    (.mkdirs (io/file config-dir))
     (when-not (.exists (io/file (:sources defaults)))
       (spit (io/file (:sources defaults)) ()))
     (when-not (.exists (io/file (:current defaults)))
@@ -96,4 +96,4 @@
          (.exists (io/file (:current defaults)))
          (.exists (io/file (:previous defaults)))
          (.exists (io/file (:history defaults)))
-         (.exists (io/file config-file)))))
+         (.exists config-file))))

@@ -53,15 +53,11 @@
         (println)
         (println (usage summary))
         (System/exit 1))
-      (not (config/init?))
-      (do
-        (println "Wallpaper configuration has not been initialized. Please run with --init.")
-        (System/exit 1))
       (:init options)
       (do
         (config/init!)
         (println "Initialization complete now set the wallpaper path in the config file:")
-        (println "Default configuration path: " (config/default-config-path))
+        (println "Default configuration path: " (str (config/config-file)))
         (System/exit 0))
       (not (seq (category/all!)))
       (do

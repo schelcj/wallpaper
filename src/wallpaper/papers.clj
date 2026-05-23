@@ -3,6 +3,7 @@
   (:require [wallpaper.config :as config])
   (:require [wallpaper.category :as category])
   (:require [wallpaper.history :as history])
+  (:require [wallpaper.fileutils :as fileutils])
   (:require [clojure.java.io :as io])
   (:require [clojure.java.shell :refer [sh]])
   (:require [clojure.string :as s])
@@ -93,6 +94,23 @@
   (history/set-current! wallpaper)
   (history/record! wallpaper))
 
+(defn convert!
+  "Converts, and saves, the given wallpaper image to grayscale.
+  Returns the path to the converted image with new name in the cache.
+
+  Arguments:
+  - wallpaper (string): Path to the image file that will be converted"
+  [wallpaper]
+  (let [config (config/restore!)
+        fileinfo (fileutils/fileparse wallpaper)
+        output (fileutils/add-file-suffix wallpaper "gray" config/cache-dir)
+        converter (:path (:converter config))
+        args (:opts (:converter config))
+        cmd (concat [converter] [wallpaper] (:output args) [output])]
+    (if (not (.exists (io/file output)))
+      (apply sh cmd))
+    output))
+
 (defn display!
   "Displays the provided wallpaper or tile over the entire root window.
 
@@ -102,8 +120,11 @@
   (let [config (config/restore!)
         is_tile (s/starts-with? wallpaper (:tiles-dir config))
         setter (:path (:setter config))
+        image (if (:gray-scale config)
+               (convert! wallpaper)
+               wallpaper)
         args (if is_tile
                (:tiled (:opts (:setter config)))
                (:full (:opts (:setter config))))
         ]
-    (sh setter args wallpaper)))
+    (sh setter args image)))

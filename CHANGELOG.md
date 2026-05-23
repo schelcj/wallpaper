@@ -4,7 +4,23 @@ All notable changes to this project will be documented
 in this file. This change log follows the conventions
 of [keepachangelog.com](https://keepachangelog.com/).
 
-## [Unreleased]
+## [Unreleassd]
+
+## [0.1.5] - 2026-05-23
+
+### Changed
+- added `fileutils` for basic file path manip _(e.g. basename, dirname, etc)_
+- reworked the `config` namespace to merge the default config and the user config
+  as well as provide templated paths in the config as placeholder for XDG paths
+
+### Added
+
+- convert wallpaper images to gray-scale based on config option
+
+### Removed
+
+- dropped the `config/init?` preflight test that looks for the user config that
+  is now no longer required because the default is merged with any user settings.
 
 ## [0.1.4] - 2025-12-27
 

@@ -70,4 +70,7 @@
  ;; imagemagick to convert to grayscale.
  :converter {:path "/usr/bin/convert"
              :opts {:input ""
-                    :output "-colorspace Gray -type Grayscale"}}}
+                    :output ["-colorspace" "Gray" "-type" "Grayscale"]}}
+
+ ;; convert all images to gray-scale
+ :gray-scale nil}

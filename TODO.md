@@ -12,7 +12,7 @@
 - [ ] add ui for configuration, preview, and setting
 - [-] store metadata on the score of the wallpaper when displayed, could include the mtime at the time dispalyed as well
 - [ ] detect overall brightness and or tone to favor darker and warmer images if desired
-- [ ] convert all images to grayscale for B&W feel
+- [x] convert all images to grayscale for B&W feel
 - [x] add arg to show the weighting of the current wallpaper _v0.1.1_
 - [x] add arg to show stats of wallpapers displayed by category (including how many displayed by category and total)
 - [x] handle app-name more generically so a rename is easier
@@ -21,6 +21,9 @@
 - [ ] add arg to uninstall to cleanup
 - [ ] do not let stack traces go to the user
 - [x] add a constants class for name and version for starters
+- [ ] add arg to write default config to XDG_CONFIG_DIR
+- [ ] drop need for `--init` with preflight checks
+- [ ] hash gray scale cache file directories or just use a single file. the directory of is going to get out of hand.
 
 ## Documentation
 
