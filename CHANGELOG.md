@@ -6,9 +6,18 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleassd]
 
+### Changed
+
+- added `prefligh-check!` to make sure default files and dirs are in place
+
+### Removed
+
+- no longer need the `--init` command line flag with preflight checks
+
 ## [0.1.5] - 2026-05-23
 
 ### Changed
+
 - added `fileutils` for basic file path manip _(e.g. basename, dirname, etc)_
 - reworked the `config` namespace to merge the default config and the user config
   as well as provide templated paths in the config as placeholder for XDG paths

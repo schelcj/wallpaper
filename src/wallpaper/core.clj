@@ -22,7 +22,6 @@
    ["-p" "--previous" "Set the wallpaper to the previous image"]
    ["-i" "--image IMAGE" "Set the provided image as the current wallpaper"]
    ["-r" "--clear" "Clear the previous wallpaper category"]
-   ["-I" "--init" "Initialize caching and configuration files"]
    [nil "--current" "Show the currently display wallpaper path"]
    [nil "--show-weight" "Show the weight of the current wallpaper"]
    [nil "--stats" "Show various stats for the wallpaper library"]
@@ -41,6 +40,7 @@
   [& args]
   (let [config (config/restore!)
         {:keys [options arguments errors summary]} (parse-opts args cli-options)]
+    (config/preflight-check!)
     (cond
       (:help options)
       (do
@@ -53,12 +53,6 @@
         (println)
         (println (usage summary))
         (System/exit 1))
-      (:init options)
-      (do
-        (config/init!)
-        (println "Initialization complete now set the wallpaper path in the config file:")
-        (println "Default configuration path: " (str (config/config-file)))
-        (System/exit 0))
       (not (seq (category/all!)))
       (do
         (println "No categories defined yet!")

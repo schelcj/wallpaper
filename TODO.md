@@ -22,8 +22,9 @@
 - [ ] do not let stack traces go to the user
 - [x] add a constants class for name and version for starters
 - [ ] add arg to write default config to XDG_CONFIG_DIR
-- [ ] drop need for `--init` with preflight checks
+- [x] drop need for `--init` with preflight checks
 - [ ] hash gray scale cache file directories or just use a single file. the directory of is going to get out of hand.
+- [ ] make `config` a constant instead of loading from disk in every function
 
 ## Documentation
 

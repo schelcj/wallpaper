@@ -68,32 +68,48 @@
         defaults (edn/read-string (slurp (io/resource "config.edn")))]
     (merge (apply-placeholders defaults) (apply-placeholders userconfig))))
 
-(defn init!
-  "Create all the initial configuration, cache, and state files and directories"
+(defn create-default-config!
+  "Creates a local user copy of the default configuration from the resources in the $XDG_CONFIG_DIR."
   []
-  (let [defaults (restore!)]
-    (.mkdirs (io/file data-dir))
-    (.mkdirs (io/file cache-dir))
-    (.mkdirs (io/file config-dir))
-    (when-not (.exists (io/file (:sources defaults)))
-      (spit (io/file (:sources defaults)) ()))
-    (when-not (.exists (io/file (:current defaults)))
-      (spit (io/file (:current defaults)) ()))
-    (when-not (.exists (io/file (:previous defaults)))
-      (spit (io/file (:previous defaults)) ()))
-    (when-not (.exists (io/file (:history defaults)))
-      (spit (io/file (:history defaults)) ()))
-    (when-not (.exists config-file)
-      (with-open [in (io/input-stream (io/resource "config.edn"))
-                  out (io/output-stream config-file)]
-        (io/copy in out)))))
+  (when-not (.exists config-file)
+    (with-open [in (io/input-stream (io/resource "config.edn"))
+                out (io/output-stream config-file)]
+      (io/copy in out))))
 
-(defn init?
-  "Has the configuration be initialized?"
+(defn default-files
+  "Generates a vector of the default files from the config that we need to create if they do not exist."
   []
-  (let [defaults (restore!)]
-    (and (.exists (io/file (:sources defaults)))
-         (.exists (io/file (:current defaults)))
-         (.exists (io/file (:previous defaults)))
-         (.exists (io/file (:history defaults)))
-         (.exists config-file))))
+  (let [defaults (restore!)
+        {:keys [sources current previous history]} defaults
+        paths [sources current previous history]]
+    paths))
+
+(defn create-file
+  "Creates a given file if it does not already exist.
+
+  Arguments:
+  - file (string): path to file that should be created"
+  [path]
+  (let [file (io/file path)]
+    (when-not (.exists file)
+      (spit file ()))))
+
+(defn preflight-check-files!
+  "check if all the default files exists and if not create."
+  []
+  (let [defaults (restore!)
+        files (default-files)]
+    (map create-file files)))
+
+(defn preflight-check-dirs!
+  "check if all the default directories exists and if not create."
+  []
+  (let [defaults (restore!)
+        dirs [data-dir cache-dir config-dir]]
+    (map #(.mkdir (io/file %)) dirs)))
+
+(defn preflight-check!
+  "check that all files/dirs exists before starting"
+  []
+  (preflight-check-dirs!)
+  (preflight-check-files!))
