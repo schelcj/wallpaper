@@ -11,17 +11,14 @@
   (:gen-class))
 
 (def cli-options
-  [["-c" "--category CATEGORY" "Wallpaper category"]
-   ["-a" "--add-category CATEGORY" "Add category to the selection list"]
-   ["-d" "--del-category CATEGORY" "Remove category from the selection list"]
-   ["-C" "--show-categories" "Print all configured categories to STDOUT"]
+  [["-c" "--lock-category CATEGORY" "Lock the wallpaper category to CATEGORY"]
    ["-F" "--flush-cache" "Flush the wallpaper history cache"]
    ["-S" "--show-cache" "Print current wallpaper history cache to STDOUT"]
    ["-l" "--lock" "Lock the current wallpaper"]
    ["-u" "--unlock" "Unlock the current wallpaper"]
    ["-p" "--previous" "Set the wallpaper to the previous image"]
    ["-i" "--image IMAGE" "Set the provided image as the current wallpaper"]
-   ["-r" "--clear" "Clear the previous wallpaper category"]
+   [nil "--clear" "Clear the previous wallpaper category"]
    [nil "--current" "Show the currently display wallpaper path"]
    [nil "--show-weight" "Show the weight of the current wallpaper"]
    [nil "--stats" "Show various stats for the wallpaper library"]
@@ -53,13 +50,6 @@
         (println)
         (println (usage summary))
         (System/exit 1))
-      (not (seq (category/all!)))
-      (do
-        (println "No categories defined yet!")
-        (println "use --add-category to get started")
-        (println)
-        (println (usage summary))
-        (System/exit 1))
       (:current options)
       (do
         (println (history/get-current!))
@@ -74,18 +64,6 @@
       (:category options)
       (do
         (category/record! (:category options)))
-      (:add-category options)
-      (do
-        (category/add-category! (:add-category options))
-        (System/exit 0))
-      (:del-category options)
-      (do
-        (category/del-category! (:del-category options))
-        (System/exit 0))
-      (:show-categories options)
-      (do
-        (pprint (category/get-categories))
-        (System/exit 0))
       (:show-cache options)
       (do
         (pprint (history/restore!))

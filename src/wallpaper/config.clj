@@ -80,8 +80,8 @@
   "Generates a vector of the default files from the config that we need to create if they do not exist."
   []
   (let [defaults (restore!)
-        {:keys [sources current previous history]} defaults
-        paths [sources current previous history]]
+        {:keys [current previous history]} defaults
+        paths [current previous history]]
     paths))
 
 (defn create-file

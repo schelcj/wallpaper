@@ -20,12 +20,7 @@
 ;; - show-categories!
 
 ;; (def category-file (File/createTempFile "test-category-" ".edn"))
-;; (def sources-file (io/resource "fixtures/sources"))
-;; (def categories (string/split-lines (slurp sources-file)))
-
-;; (deftest test-all!
-;;   (testing "Loading all categories")
-;;   (is (= (count categories) (count (cat/all! sources-file)))))
+;; (def categories ())
 
 ;; (deftest test-record!
 ;;   (testing "Recording a catgory")

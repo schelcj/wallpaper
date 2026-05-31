@@ -18,16 +18,16 @@
  ;; No subcategories for tiles (i.e. all in a single top-level directory).
  :tiles-dir "{{home}}/Dropbox/Wallpapers/Tiles"
 
- ;; Where to store the category to that limits
- ;; random selection to.
- :category-file "{{xdg-data-dir}}/category.edn"
+ ;; The root `:wallpapers-dir` should have one or more directories that we
+ ;; call categories. These can be anything from the source (e.g. reddit r/wallpapers)
+ ;; of the image to a season (i.e. xmas time).
+ :categories ("reddit")
 
- ;; A set of categories (i.e. directories) under the :wallpaper-dir
- ;; root directory to limit the selection to if no category
- ;; was specifically choosen with `--category`. For example; this prevents
- ;; displaying xmas images out of season or showing the Propaganda
- ;; tiles in a full screen mode without tiling.
- :sources "{{xdg-data-dir}}/sources.edn"
+ ;; Where to store the category to that limits random selection. This
+ ;; does not have to be a directory in the default categories.
+ ;;
+ ;; For example; limit the selection to just xmas images.
+ :category-file "{{xdg-data-dir}}/category.edn"
 
  ;; Records all wallpapers that have been displayed previously
  ;; since the last cache flush.

@@ -6,17 +6,14 @@
   (:gen-class))
 
 (defn all!
-  "Returns all the category (i.e. directories) to search for wallpapers.
-  The default categories are in the `sources.edn` file within the configuration
-  directory. These are returned by default but can be overriden with the `--category`
-  argument which will limit selection to just that directory. This is stored in the
-  `category.end` file within the configuration directory."
+  "Returns all the categories to search for wallpapers as defined in the `:categories`
+  config value or from the category lock file set by `--category`."
   []
   (let [config (config/restore!)
         category-file (io/file (:category-file config))]
     (if (.exists category-file)
       (edn/read-string (slurp category-file))
-      (edn/read-string (slurp (:sources config))))))
+      (:categories config))))
 
 (defn record!
   "Record the category to filter to the `category.edn` file within the configuration directory.
@@ -29,34 +26,7 @@
     (spit (:category-file config) (pr-str [category]))))
 
 (defn clear!
-  "Delete the category file that is used to filter the search for available wallpapers.
-  This will allow selection of all wallpapers defined in the `sources.edn` file."
+  "Delete the category lock file used to filter the search for available wallpapers."
   []
   (let [config (config/restore!)]
     (.delete (io/file (:category-file config)))))
-
-(defn add-category!
-  "Adds a category to the list of categories search for a random wallpaper.
-
-  Arguments:
-  - category (String): category to add"
-  [category]
-  (let [config (config/restore!)
-        sources (edn/read-string (slurp (:sources config)))]
-    (spit (:sources config) (seq (conj (set sources) category)))))
-
-(defn del-category!
-  "Removes a category from the list of categories to search for a random wallpaper.
-
-  Argurments:
-  - category (String): category to remove"
-  [category]
-  (let [config (config/restore!)
-        sources (edn/read-string (slurp (:sources config)))]
-    (spit (:sources config) (pr-str (filter #(not= category %) sources)))))
-
-(defn get-categories
-  "Return the list of categories current configured that will be used in the random selection."
-  []
-  (let [config (config/restore!)]
-    (edn/read-string (slurp (:sources config)))))

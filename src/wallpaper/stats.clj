@@ -9,15 +9,15 @@
 (defn total-wallpapers-available
   "The count of all wallpapers available in the currently configured catgories"
   []
-  (let [sources (category/all!)
-        dirs (papers/dirs sources)]
+  (let [categories (category/all!)
+        dirs (papers/dirs categories)]
     (count (papers/gather dirs))))
 
 (defn total-wallpapers-available-by-category
   "The count of wallpapers available in the current configured categories broken down by category."
   []
-  (let [sources (category/all!)
-        dirs (papers/dirs sources)]
+  (let [categories (category/all!)
+        dirs (papers/dirs categories)]
     (zipmap
      (map #(history/get-relative-path (.getPath %)) dirs)
      (map #(count (papers/gather [%])) dirs))))

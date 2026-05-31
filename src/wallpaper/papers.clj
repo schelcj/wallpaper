@@ -13,10 +13,10 @@
   "Build a seq of all the directories to search for wallpapers in.
 
   Arguments:
-  - sources (vector): Potential directory supplied on command line via the --category flag."
-  [sources]
+  - categories (vector): Potential directory supplied on command line via the --category flag."
+  [categories]
   (let [config (config/restore!)]
-    (vec (map #(io/file (:wallpapers-dir config) %) sources))))
+    (vec (map #(io/file (:wallpapers-dir config) %) categories))))
 
 (defn gather
   "Build a seq of all the available wallpapers on disk.
@@ -71,8 +71,8 @@
   weighting to favor new images."
   []
   (let [config (config/restore!)
-        sources (category/all!)
-        dirs (dirs sources)
+        categories (category/all!)
+        dirs (dirs categories)
         wallpapers (gather dirs)
         filtered-wallpapers (prune! wallpapers)
         effective-wallpapers (if (seq filtered-wallpapers)
