@@ -1,6 +1,6 @@
 (ns wallpaper.history
   "Functions for history cache handling."
-  (:require [wallpaper.config :as config])
+  (:require [wallpaper.config :as cfg])
   (:require [clojure.edn :as edn])
   (:require  [clojure.java.io :as io])
   (:gen-class))
@@ -8,8 +8,7 @@
 (defn restore!
   "Read the history of previously displayed wallpapers."
   []
-  (let [config (config/restore!)
-        history (io/file (:history config))]
+  (let [history (io/file (:history cfg/config))]
     (if (.exists history)
       (edn/read-string (slurp history)))))
 
@@ -19,16 +18,13 @@
   Arguments:
   - wallpaper (String): Add the wallpaper to the history of displayed papers."
   [wallpaper]
-  (let [config (config/restore!)
-        wallpapers (restore!)]
-    (spit (:history config) (pr-str (cons wallpaper wallpapers)))))
+  (let [wallpapers (restore!)]
+    (spit (:history cfg/config) (pr-str (cons wallpaper wallpapers)))))
 
 (defn clear!
   "Clear the history contents to start over."
   []
-  (let [config (config/restore!)
-        history (io/file (:history config))]
-    (spit (:history config) ())))
+  (spit (:history cfg/config) ()))
 
 (defn set-current!
   "Record the given wallpaper as the current.
@@ -36,31 +32,26 @@
   Arguments:
   - wallpaper (String): String path of the current wallpaper to save"
   [wallpaper]
-  (let [config (config/restore!)]
-    (spit (:current config) (pr-str wallpaper))))
+  (spit (:current cfg/config) (pr-str wallpaper)))
 
 (defn get-current!
   "Gets the current wallpaper"
   []
-  (let [config (config/restore!)]
-    (edn/read-string (slurp (:current config)))))
+  (edn/read-string (slurp (:current cfg/config))))
 
 (defn set-previous!
   "Sets the previous wallpaper to the current"
   []
-  (let [config (config/restore!)
-        current (io/file (:current config))
-        previous (io/file (:previous config))]
+  (let [current (io/file (:current cfg/config))
+        previous (io/file (:previous cfg/config))]
     (io/copy current previous)))
 
 (defn get-previous!
   "Gets the previous wallpaper."
   []
-  (let [config (config/restore!)]
-    (edn/read-string (slurp (:previous config)))))
+  (edn/read-string (slurp (:previous cfg/config))))
 
 (defn get-relative-path
   "Gets a wallpapers path relative to the base directory (i.e. the category)."
   [path]
-  (let [config (config/restore!)]
-    (subs path (inc (count (:wallpapers-dir config))))))
+  (subs path (inc (count (:wallpapers-dir cfg/config)))))

@@ -1,6 +1,6 @@
 (ns wallpaper.papers
   "Functions to find, filter, weight, and apply the wallpaper."
-  (:require [wallpaper.config :as config])
+  (:require [wallpaper.config :as cfg])
   (:require [wallpaper.category :as category])
   (:require [wallpaper.history :as history])
   (:require [wallpaper.fileutils :as fileutils])
@@ -15,8 +15,7 @@
   Arguments:
   - categories (vector): Potential directory supplied on command line via the --category flag."
   [categories]
-  (let [config (config/restore!)]
-    (vec (map #(io/file (:wallpapers-dir config) %) categories))))
+  (vec (map #(io/file (:wallpapers-dir cfg/config) %) categories)))
 
 (defn gather
   "Build a seq of all the available wallpapers on disk.
@@ -35,8 +34,7 @@
   Arguments:
   - wallpapers (seq): All wallpapers that were found for the given categories."
   [wallpapers]
-  (let [config (config/restore!)]
-    (remove (set (history/restore!)) wallpapers)))
+  (remove (set (history/restore!)) wallpapers))
 
 (defn weight!
   "Applies a weight for the given wallpaper based on the mtime of the file.
@@ -45,14 +43,13 @@
   - wallpaper (String): Full path to an image file to test."
   [wallpaper]
   (let [now (quot (System/currentTimeMillis) 1000)
-        mtime (quot (.lastModified (io/file wallpaper)) 1000)
-        config (config/restore!)]
+        mtime (quot (.lastModified (io/file wallpaper)) 1000)]
     (when-let [weight (some->>
-                       (keys (:weights config))
+                       (keys (:weights cfg/config))
                        (filter #(< (- now %) mtime))
                        seq
                        (reduce min))]
-      (get (:weights config) weight))))
+      (get (:weights cfg/config) weight))))
 
 (defn apply-weights
   "Weight the wallpapers based on the mtime of the file so we favor newer images.
@@ -61,8 +58,7 @@
   - wallpapers (seq): All wallpapers that we would like to weight."
   [wallpapers]
   (mapcat (fn [wallpaper]
-            (let [config (config/restore!)
-                  w (or (weight! wallpaper) 1)]
+            (let [w (or (weight! wallpaper) 1)]
               (repeat w wallpaper)))
           wallpapers))
 
@@ -70,8 +66,7 @@
   "Get a random wallpaper from a list of wallpapers filtering out previously displayed papers and applying
   weighting to favor new images."
   []
-  (let [config (config/restore!)
-        categories (category/all!)
+  (let [categories (category/all!)
         dirs (dirs categories)
         wallpapers (gather dirs)
         filtered-wallpapers (prune! wallpapers)
@@ -101,11 +96,10 @@
   Arguments:
   - wallpaper (string): Path to the image file that will be converted"
   [wallpaper]
-  (let [config (config/restore!)
-        fileinfo (fileutils/fileparse wallpaper)
-        output (fileutils/add-file-suffix wallpaper "gray" config/cache-dir)
-        converter (:path (:converter config))
-        args (:opts (:converter config))
+  (let [fileinfo (fileutils/fileparse wallpaper)
+        output (fileutils/add-file-suffix wallpaper "gray" cfg/cache-dir)
+        converter (:path (:converter cfg/config))
+        args (:opts (:converter cfg/config))
         cmd (concat [converter] [wallpaper] (:output args) [output])]
     (if (not (.exists (io/file output)))
       (apply sh cmd))
@@ -117,14 +111,13 @@
   Arguments:
   - wallaper (String): Path to the image, or tile, to display."
   [wallpaper]
-  (let [config (config/restore!)
-        is_tile (s/starts-with? wallpaper (:tiles-dir config))
-        setter (:path (:setter config))
-        image (if (:gray-scale config)
+  (let [is_tile (s/starts-with? wallpaper (:tiles-dir cfg/config))
+        setter (:path (:setter cfg/config))
+        image (if (:gray-scale cfg/config)
                (convert! wallpaper)
                wallpaper)
         args (if is_tile
-               (:tiled (:opts (:setter config)))
-               (:full (:opts (:setter config))))
+               (:tiled (:opts (:setter cfg/config)))
+               (:full (:opts (:setter cfg/config))))
         ]
     (sh setter args image)))

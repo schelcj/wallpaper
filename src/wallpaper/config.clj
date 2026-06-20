@@ -68,6 +68,9 @@
         defaults (edn/read-string (slurp (io/resource "config.edn")))]
     (merge (apply-placeholders defaults) (apply-placeholders userconfig))))
 
+(defonce ^{:doc "Make the configuration available when the namespace is loaded."} config
+  (restore!))
+
 (defn create-default-config!
   "Creates a local user copy of the default configuration from the resources in the $XDG_CONFIG_DIR."
   []
@@ -79,8 +82,7 @@
 (defn default-files
   "Generates a vector of the default files from the config that we need to create if they do not exist."
   []
-  (let [defaults (restore!)
-        {:keys [current previous history]} defaults
+  (let [{:keys [current previous history]} config
         paths [current previous history]]
     paths))
 
@@ -97,15 +99,13 @@
 (defn preflight-check-files!
   "check if all the default files exists and if not create."
   []
-  (let [defaults (restore!)
-        files (default-files)]
+  (let [files (default-files)]
     (map create-file files)))
 
 (defn preflight-check-dirs!
   "check if all the default directories exists and if not create."
   []
-  (let [defaults (restore!)
-        dirs [data-dir cache-dir config-dir]]
+  (let [dirs [data-dir cache-dir config-dir]]
     (map #(.mkdir (io/file %)) dirs)))
 
 (defn preflight-check!

@@ -1,6 +1,6 @@
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
-  (:require [wallpaper.config :as config])
+  (:require [wallpaper.config :as cfg])
   (:require [wallpaper.category :as category])
   (:require [wallpaper.papers :as papers])
   (:require [wallpaper.stats :as stats])
@@ -35,9 +35,8 @@
 
 (defn -main
   [& args]
-  (let [config (config/restore!)
-        {:keys [options arguments errors summary]} (parse-opts args cli-options)]
-    (config/preflight-check!)
+  (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
+    (cfg/preflight-check!)
     (cond
       (:help options)
       (do
@@ -56,11 +55,11 @@
         (System/exit 0))
       (:lock options)
       (do
-        (spit (:lock-file config) "")
+        (spit (:lock-file cfg/config) "")
         (System/exit 0))
       (:unlock options)
       (do
-        (.delete (io/file (:lock-file config))))
+        (.delete (io/file (:lock-file cfg/config))))
       (:category options)
       (do
         (category/record! (:category options)))
@@ -124,7 +123,7 @@
         (println const/APP_NAME const/VERSION)
         (System/exit 0)))
 
-    (let [lock (io/file (:lock-file config))]
+    (let [lock (io/file (:lock-file cfg/config))]
       (if (.exists lock)
         (System/exit 1)
         (let [wallpaper (papers/random!)]

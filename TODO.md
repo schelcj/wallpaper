@@ -7,7 +7,7 @@
 
 ## Features
 
-- [-] move categories to the config and drop reading from disk and cli opts
+- [x] move categories to the config and drop reading from disk and cli opts
 - [-] move config, cache, history to sqlite _(but why...)_
 - [ ] add ui for configuration, preview, and setting
 - [-] store metadata on the score of the wallpaper when displayed, could include the mtime at the time dispalyed as well
@@ -21,10 +21,10 @@
 - [ ] add arg to uninstall to cleanup
 - [ ] do not let stack traces go to the user
 - [x] add a constants class for name and version for starters
-- [ ] add arg to write default config to XDG_CONFIG_DIR
+- [x] add arg to write default config to XDG_CONFIG_DIR
 - [x] drop need for `--init` with preflight checks
 - [ ] hash gray scale cache file directories or just use a single file. the directory of is going to get out of hand.
-- [ ] make `config` a constant instead of loading from disk in every function
+- [x] make `config` a constant instead of loading from disk in every function
 - [ ] make gray scale option only ever keep a single image instead of renamed image to save diskspace
 - [ ] new write config option should warn on existence and maybe differences from default
 
