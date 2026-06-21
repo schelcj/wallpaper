@@ -6,6 +6,8 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleassd]
 
+## [0.1.6] - 2026-06-21
+
 ### Changed
 
 - added `prefligh-check!` to make sure default files and dirs are in place
