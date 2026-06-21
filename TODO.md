@@ -25,7 +25,7 @@
 - [x] drop need for `--init` with preflight checks
 - [ ] hash gray scale cache file directories or just use a single file. the directory of is going to get out of hand.
 - [x] make `config` a constant instead of loading from disk in every function
-- [ ] make gray scale option only ever keep a single image instead of renamed image to save diskspace
+- [x] make gray scale option only ever keep a single image instead of renamed image to save diskspace
 - [ ] new write config option should warn on existence and maybe differences from default
 
 ## Documentation

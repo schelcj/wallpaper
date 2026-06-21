@@ -97,12 +97,11 @@
   - wallpaper (string): Path to the image file that will be converted"
   [wallpaper]
   (let [fileinfo (fileutils/fileparse wallpaper)
-        output (fileutils/add-file-suffix wallpaper "gray" cfg/cache-dir)
+        output (fileutils/create-file-by-extension wallpaper "gray-scale-image" cfg/cache-dir)
         converter (:path (:converter cfg/config))
         args (:opts (:converter cfg/config))
         cmd (concat [converter] [wallpaper] (:output args) [output])]
-    (if (not (.exists (io/file output)))
-      (apply sh cmd))
+    (apply sh cmd)
     output))
 
 (defn display!
@@ -114,10 +113,9 @@
   (let [is_tile (s/starts-with? wallpaper (:tiles-dir cfg/config))
         setter (:path (:setter cfg/config))
         image (if (:gray-scale cfg/config)
-               (convert! wallpaper)
-               wallpaper)
+                (convert! wallpaper)
+                wallpaper)
         args (if is_tile
                (:tiled (:opts (:setter cfg/config)))
-               (:full (:opts (:setter cfg/config))))
-        ]
+               (:full (:opts (:setter cfg/config))))]
     (sh setter args image)))

@@ -73,3 +73,16 @@
         name (format "%s_%s.%s" (:filename fileinfo) suffix (:ext fileinfo))
         dirname (or dir (:dirname fileinfo))]
     (s/join separator [dirname name])))
+
+(defn create-file-by-extension
+  "Create a new filepath in a given directory with the extension of a given file.
+
+  Arguments:
+  - file (String): full file path
+  - name (String): name for the new file
+  - dir (String): path where the new file should live"
+  [file name dir]
+  (let [separator (System/getProperty "file.separator")
+        fileinfo (fileparse file)
+        name (s/join "." [name (:ext fileinfo)])]
+    (s/join separator [dir name])))

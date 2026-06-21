@@ -9,6 +9,8 @@ of [keepachangelog.com](https://keepachangelog.com/).
 ### Changed
 
 - added `prefligh-check!` to make sure default files and dirs are in place
+- updated the config namespace to create a single instance of the config to avoid hitting disk in every function
+- create a single gray scale image and overwrite each time to save disk space
 
 ### Removed
 
