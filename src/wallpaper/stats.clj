@@ -1,6 +1,6 @@
 (ns wallpaper.stats
   "Functions for stats about the library."
-  (:require [wallpaper.category :as category])
+  (:require [wallpaper.config :as cfg])
   (:require [wallpaper.history :as history])
   (:require [wallpaper.papers :as papers])
   (:require [clojure.java.io :as io])
@@ -10,14 +10,14 @@
 (defn total-wallpapers-available
   "The count of all wallpapers available in the currently configured catgories"
   []
-  (let [categories (category/all!)
+  (let [categories (:categories cfg/config)
         dirs (papers/dirs categories)]
     (count (papers/gather dirs))))
 
 (defn total-wallpapers-available-by-category
   "The count of wallpapers available in the current configured categories broken down by category."
   []
-  (let [categories (category/all!)
+  (let [categories (:categories cfg/config)
         dirs (papers/dirs categories)]
     (zipmap
      (map #(history/get-relative-path (.getPath %)) dirs)

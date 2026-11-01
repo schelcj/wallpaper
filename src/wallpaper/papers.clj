@@ -1,7 +1,6 @@
 (ns wallpaper.papers
   "Functions to find, filter, weight, and apply the wallpaper."
   (:require [wallpaper.config :as cfg])
-  (:require [wallpaper.category :as category])
   (:require [wallpaper.history :as history])
   (:require [wallpaper.fileutils :as fileutils])
   (:require [clojure.java.io :as io])
@@ -13,7 +12,7 @@
   "Build a seq of all the directories to search for wallpapers in.
 
   Arguments:
-  - categories (vector): Potential directory supplied on command line via the --category flag."
+  - categories (vector): Categories to build a list of directories to search."
   [categories]
   (vec (map #(io/file (:wallpapers-dir cfg/config) %) categories)))
 
@@ -66,7 +65,7 @@
   "Get a random wallpaper from a list of wallpapers filtering out previously displayed papers and applying
   weighting to favor new images."
   []
-  (let [categories (category/all!)
+  (let [categories (:categories cfg/config)
         dirs (dirs categories)
         wallpapers (gather dirs)
         filtered-wallpapers (prune! wallpapers)
@@ -119,3 +118,13 @@
                (:tiled (:opts (:setter cfg/config)))
                (:full (:opts (:setter cfg/config))))]
     (sh setter args image)))
+
+(defn lock!
+  "Set a lockfile in `:lock-file` location to prevent changing the current wallpaper."
+  []
+  (spit (:lock-file cfg/config) ""))
+
+(defn unlock!
+  "Remove the lockfile at `:lock-file` to allow new wallpapers to be displayed."
+  []
+  (.delete (io/file (:lock-file cfg/config))))

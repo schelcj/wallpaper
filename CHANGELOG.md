@@ -6,6 +6,19 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleassd]
 
+## [0.1.7] - 2026-11-01
+
+### Changed
+
+- moved lock/unlock to the papers namespace so i can start writing tests
+- with categories in the config file there is no need for extra code to limit/lock categories, just edit the config instead.
+- `--unlock` now just removes the lock file and no longer changes the current wallpaper
+
+### Removed
+
+- category lock command line argument
+- calls to the category namespace and deleted the namespace
+
 ## [0.1.6] - 2026-06-21
 
 ### Changed

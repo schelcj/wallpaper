@@ -23,12 +23,6 @@
  ;; of the image to a season (i.e. xmas time).
  :categories ("reddit")
 
- ;; Where to store the category to that limits random selection. This
- ;; does not have to be a directory in the default categories.
- ;;
- ;; For example; limit the selection to just xmas images.
- :category-file "{{xdg-data-dir}}/category.edn"
-
  ;; Records all wallpapers that have been displayed previously
  ;; since the last cache flush.
  :history "{{xdg-cache-dir}}/history.edn"

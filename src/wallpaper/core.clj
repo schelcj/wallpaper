@@ -1,7 +1,6 @@
 (ns wallpaper.core
   (:require [wallpaper.history :as history])
   (:require [wallpaper.config :as cfg])
-  (:require [wallpaper.category :as category])
   (:require [wallpaper.papers :as papers])
   (:require [wallpaper.stats :as stats])
   (:require [wallpaper.constants :as const])
@@ -11,14 +10,12 @@
   (:gen-class))
 
 (def cli-options
-  [["-c" "--lock-category CATEGORY" "Lock the wallpaper category to CATEGORY"]
-   ["-F" "--flush-cache" "Flush the wallpaper history cache"]
+  [["-F" "--flush-cache" "Flush the wallpaper history cache"]
    ["-S" "--show-cache" "Print current wallpaper history cache to STDOUT"]
    ["-l" "--lock" "Lock the current wallpaper"]
    ["-u" "--unlock" "Unlock the current wallpaper"]
    ["-p" "--previous" "Set the wallpaper to the previous image"]
    ["-i" "--image IMAGE" "Set the provided image as the current wallpaper"]
-   [nil "--clear" "Clear the previous wallpaper category"]
    [nil "--current" "Show the currently display wallpaper path"]
    [nil "--show-weight" "Show the weight of the current wallpaper"]
    [nil "--stats" "Show various stats for the wallpaper library"]
@@ -55,14 +52,12 @@
         (System/exit 0))
       (:lock options)
       (do
-        (spit (:lock-file cfg/config) "")
+        (papers/lock!)
         (System/exit 0))
       (:unlock options)
       (do
-        (.delete (io/file (:lock-file cfg/config))))
-      (:category options)
-      (do
-        (category/record! (:category options)))
+        (papers/unlock!)
+        (System/exit 0))
       (:show-cache options)
       (do
         (pprint (history/restore!))
@@ -80,10 +75,6 @@
       (do
         (let [wallpaper (:image options)]
           (papers/display! wallpaper))
-        (System/exit 0))
-      (:clear options)
-      (do
-        (category/clear!)
         (System/exit 0))
       (:stats options)
       (do
