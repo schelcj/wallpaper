@@ -6,7 +6,7 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 ## [Unreleassd]
 
-## [0.1.7] - 2026-11-01
+## [0.1.8] - 2026-11-01
 
 ### Changed
 
@@ -18,6 +18,10 @@ of [keepachangelog.com](https://keepachangelog.com/).
 
 - category lock command line argument
 - calls to the category namespace and deleted the namespace
+
+## [0.1.7] - 2026-06-21
+
+_something wrong with this release builds_
 
 ## [0.1.6] - 2026-06-21
 

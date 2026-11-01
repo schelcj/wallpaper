@@ -2,6 +2,6 @@
   "This namespace is for any constants we might have for the application."
   (:gen-class))
 
-(def VERSION "0.1.7")
+(def VERSION "0.1.8")
 
 (def APP_NAME "wallpaper")
